@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore;
+﻿using ExerciseDaemon.Signup.BackgroundWorker;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ExerciseDaemon.Signup
 {
@@ -12,6 +14,10 @@ namespace ExerciseDaemon.Signup
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureServices((context, collection) =>
+                {
+                    collection.AddHostedService<TimedBackgroundWorker>();
+                })
                 .UseStartup<Startup>()
                 .Build();
     }
