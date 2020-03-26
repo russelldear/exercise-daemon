@@ -14,10 +14,15 @@ namespace ExerciseDaemon.Signup.ExternalServices
     public class StravaService
     {
         private readonly AthleteRepository _athleteRepository;
+        private readonly SlackService _slackService;
+        private HttpClient _client;
 
-        public StravaService(AthleteRepository athleteRepository)
+        public StravaService(AthleteRepository athleteRepository, SlackService slackService)
         {
             _athleteRepository = athleteRepository;
+            _slackService = slackService;
+
+            _client = new HttpClient();
         }
 
         public async Task<AthleteViewModel> GetOrCreateAthlete(string accessToken, int athleteIdentifier)
@@ -39,9 +44,31 @@ namespace ExerciseDaemon.Signup.ExternalServices
             if (existingAthlete == null)
             {
                 await _athleteRepository.CreateAthlete(athlete);
+
+                var retrievedAthlete = await GetAthlete(accessToken);
+
+                await _slackService.PostSlackMessage($"Welcome, {retrievedAthlete.FirstName} {retrievedAthlete.LastName}!");
             }
 
             return athlete;
+        }
+
+        private async Task<FullAthlete> GetAthlete(string accessToken)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://www.strava.com/api/v3/athlete");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var response = await _client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var activitiesResponse = await response.Content.ReadAsStringAsync();
+
+                return JsonConvert.DeserializeObject<FullAthlete>(activitiesResponse);
+            }
+
+            return null;
         }
 
         private async Task<List<Activity>> GetRecentActivities(string accessToken)
@@ -56,9 +83,7 @@ namespace ExerciseDaemon.Signup.ExternalServices
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            var client = new HttpClient();
-
-            var response = await client.SendAsync(request);
+            var response = await _client.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {

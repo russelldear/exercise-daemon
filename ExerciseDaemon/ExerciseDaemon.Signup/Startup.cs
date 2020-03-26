@@ -49,6 +49,7 @@ namespace ExerciseDaemon.Signup
                 options.ClientId = stravaSettings.ClientId.ToString();
                 options.ClientSecret = stravaSettings.ClientSecret;
                 options.Scope.Remove("public");
+                options.Scope.Add("profile:read_all");
                 options.Scope.Add("read");
                 options.Scope.Add("activity:read");
                 options.Scope.Add("activity:read_all");
