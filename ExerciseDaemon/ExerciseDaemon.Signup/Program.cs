@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ExerciseDaemon.Signup
 {
@@ -16,6 +17,8 @@ namespace ExerciseDaemon.Signup
             WebHost.CreateDefaultBuilder(args)
                 .ConfigureServices((context, collection) =>
                 {
+                    collection.TryAddSingleton<ISubstitutionBinder, SubstitutionBinder>();
+
                     collection.AddHostedService<TimedBackgroundWorker>();
                 })
                 .UseStartup<Startup>()

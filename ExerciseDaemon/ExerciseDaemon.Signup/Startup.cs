@@ -1,24 +1,43 @@
-﻿using AspNetCore.OAuth.Provider.Strava;
+﻿using System;
+using AspNetCore.OAuth.Provider.Strava;
+using ExerciseDaemon.Signup.ExternalServices;
+using ExerciseDaemon.Signup.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ExerciseDaemon.Signup
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly ISubstitutionBinder _substitutionBinder;
+
+        public Startup(IConfiguration configuration, ISubstitutionBinder substitutionBinder)
         {
+            _substitutionBinder = substitutionBinder;
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var stravaSettings = _substitutionBinder.BuildStravaSettings(services);
+            services.TryAddSingleton(stravaSettings);
+
+            var dynamoDbSettings = _substitutionBinder.BuildDynamoDbSettings(services);
+            services.TryAddSingleton(dynamoDbSettings);
+
+            var slackSettings = _substitutionBinder.BuildSlackSettings(services);
+            services.TryAddSingleton(slackSettings);
+            
+            services.TryAddSingleton<StravaService>();
+            services.TryAddSingleton(new AthleteRepository(dynamoDbSettings));
+            services.TryAddSingleton(new SlackService(slackSettings));
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -27,8 +46,8 @@ namespace ExerciseDaemon.Signup
             .AddCookie()
             .AddStrava(options =>
             {
-                options.ClientId = Configuration.GetValue<int>("Strava:ClientId").ToString();
-                options.ClientSecret = Configuration.GetValue<string>("Strava:ClientSecret");
+                options.ClientId = stravaSettings.ClientId.ToString();
+                options.ClientSecret = stravaSettings.ClientSecret;
                 options.Scope.Remove("public");
                 options.Scope.Add("read");
                 options.Scope.Add("activity:read");
