@@ -26,18 +26,24 @@ namespace ExerciseDaemon
 
         public StravaSettings BuildStravaSettings(IServiceCollection services)
         {
-            var stravaSettings = _configuration.GetSection("Strava").Get<StravaSettings>();
+            StravaSettings stravaSettings = new StravaSettings();
+
+            try
+            {
+                stravaSettings = _configuration.GetSection("Strava").Get<StravaSettings>();
+            }
+            catch { }
 
             if (stravaSettings.ClientId == default)
             {
                 stravaSettings = new StravaSettings
                 {
-                    ClientId = int.Parse(Environment.GetEnvironmentVariable("ClientId")),
-                    ClientSecret = Environment.GetEnvironmentVariable("ClientSecret")
+                    ClientId = int.Parse(Environment.GetEnvironmentVariable("StravaClientId")),
+                    ClientSecret = Environment.GetEnvironmentVariable("StravaClientSecret")
                 };
             }
 
-            return _configuration.GetSection("Strava").Get<StravaSettings>();
+            return stravaSettings;
         }
 
         public DynamoDbSettings BuildDynamoDbSettings(IServiceCollection services)
@@ -47,7 +53,23 @@ namespace ExerciseDaemon
 
         public SlackSettings BuildSlackSettings(IServiceCollection services)
         {
-            return _configuration.GetSection("Slack").Get<SlackSettings>();
+            SlackSettings slackSettings = new SlackSettings();
+
+            try
+            {
+                slackSettings = _configuration.GetSection("Slack").Get<SlackSettings>();
+            }
+            catch { }
+
+            if (string.IsNullOrWhiteSpace(slackSettings.BaseUrl))
+            {
+                slackSettings = new SlackSettings
+                {
+                    BaseUrl = Environment.GetEnvironmentVariable("SlackUrl")
+                };
+            }
+
+            return slackSettings;
         }
     }
 }
