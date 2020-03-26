@@ -17,14 +17,19 @@ namespace ExerciseDaemon.Signup.Models.Strava
         public bool IsPrivate { get; set; }
 
         public float Distance { get; set; }
+
+        [JsonProperty("start_date")]
         public DateTime StartDate { get; set; }
 
+        [JsonProperty("start_date_local")]
         public DateTime StartDateLocal { get; set; }
 
         public string Timezone { get; set; }
 
-        public int UtcOffset { get; set; }
+        [JsonProperty("utc_offset")]
+        public double UtcOffset { get; set; }
 
+        [JsonProperty("suffer_score")]
         public int SufferScore { get; set; }
     }
 }

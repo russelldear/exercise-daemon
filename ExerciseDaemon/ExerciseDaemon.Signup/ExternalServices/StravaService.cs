@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using ExerciseDaemon.Signup.Models;
 using ExerciseDaemon.Signup.Models.Strava;
 using ExerciseDaemon.Signup.Repositories;
 using Newtonsoft.Json;
@@ -19,25 +20,28 @@ namespace ExerciseDaemon.Signup.ExternalServices
             _athleteRepository = athleteRepository;
         }
 
-        public async Task CreateAthlete(string accessToken, int athleteIdentifier)
+        public async Task<AthleteViewModel> GetOrCreateAthlete(string accessToken, int athleteIdentifier)
         {
+            var activities = await GetRecentActivities(accessToken);
+
+            var latestActivity = activities.OrderByDescending(a => a.StartDateLocal).FirstOrDefault();
+
+            var athlete = new AthleteViewModel
+            {
+                Id = athleteIdentifier,
+                SignupDateTimeUtc = DateTime.UtcNow,
+                LatestActivityDateTimeUtc = latestActivity?.StartDateLocal,
+                Activities = activities
+            };
+
             var existingAthlete = await _athleteRepository.GetAthlete(athleteIdentifier);
 
             if (existingAthlete == null)
             {
-                var activities = await GetRecentActivities(accessToken);
-
-                var latestActivity = activities.OrderByDescending(a => a.StartDate).FirstOrDefault();
-
-                var athlete = new Athlete
-                {
-                    Id = athleteIdentifier,
-                    SignupDateTimeUtc = DateTime.UtcNow,
-                    LatestActivityDateTimeUtc = latestActivity?.StartDate
-                };
-
                 await _athleteRepository.CreateAthlete(athlete);
             }
+
+            return athlete;
         }
 
         private async Task<List<Activity>> GetRecentActivities(string accessToken)

@@ -20,22 +20,9 @@ namespace ExerciseDaemon.Signup.Controllers
             return Challenge(new AuthenticationProperties { RedirectUri = "Strava/Connected" }, "Strava");
         }
 
-        public async Task<IActionResult> Connected()
+        public IActionResult Connected()
         {
-            var accessToken = await HttpContext.GetTokenAsync("access_token");
-
-            if (accessToken != null && User.Identity is ClaimsIdentity claimsIdentity)
-            {
-                var athleteIdentifier = claimsIdentity.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
-
-                await _stravaService.CreateAthlete(accessToken, int.Parse(athleteIdentifier.Value));
-
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> SignOut()
