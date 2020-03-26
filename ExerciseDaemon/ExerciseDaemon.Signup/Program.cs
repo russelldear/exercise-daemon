@@ -1,4 +1,5 @@
-﻿using ExerciseDaemon.Signup.BackgroundWorker;
+﻿using System.Net;
+using ExerciseDaemon.Signup.BackgroundWorker;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,8 @@ namespace ExerciseDaemon.Signup
 
                     collection.AddHostedService<TimedBackgroundWorker>();
                 })
+                .UseKestrel(options => { options.Listen(IPAddress.Any, 5236); })
+                .UseUrls("http://*:5236")
                 .UseStartup<Startup>()
                 .Build();
     }
