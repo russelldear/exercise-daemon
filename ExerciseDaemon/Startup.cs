@@ -32,10 +32,10 @@ namespace ExerciseDaemon
 
             var slackSettings = _substitutionBinder.BuildSlackSettings();
             services.TryAddSingleton(slackSettings);
-            
+
+            services.TryAddSingleton<AthleteRepository>();
             services.TryAddSingleton<StravaService>();
-            services.TryAddSingleton(new AthleteRepository(dynamoDbSettings));
-            services.TryAddSingleton(new SlackService(slackSettings));
+            services.TryAddSingleton<SlackService>();
 
             services.AddAuthentication(options =>
             {

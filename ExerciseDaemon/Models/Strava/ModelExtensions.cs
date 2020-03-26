@@ -9,13 +9,20 @@ namespace ExerciseDaemon.Models.Strava
     {
         public static Athlete ToAthlete(this Document document)
         {
+            long? latestActivityId = null;
+
+            if (!(document[LatestActivityId] is DynamoDBNull))
+            {
+                latestActivityId = long.Parse(document[LatestActivityId]);
+            }
+
             return new Athlete
             {
                 Id = int.Parse(document[Id]),
                 Name = document[Name].ToString(),
                 AccessToken = document[AccessToken].ToString(),
                 SignupDateTimeUtc = DateTime.Parse(document[SignupDateTimeUtc]),
-                LatestActivityId = long.Parse(document[LatestActivityId])
+                LatestActivityId = latestActivityId
             };
         }
 

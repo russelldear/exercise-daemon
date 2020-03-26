@@ -10,7 +10,7 @@ namespace ExerciseDaemon.BackgroundWorker
 {
     public class TimedBackgroundWorker : IHostedService, IDisposable
     {
-        private const int FrequencySeconds = 20;
+        private const int FrequencySeconds = 300;
 
         private readonly StravaService _stravaService;
         private readonly AthleteRepository _athleteRepository;
