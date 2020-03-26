@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ExerciseDaemon.Signup.ExternalServices;
@@ -27,11 +26,11 @@ namespace ExerciseDaemon.Signup.Controllers
 
                 if (accessToken != null && User.Identity is ClaimsIdentity claimsIdentity)
                 {
-                    var athleteIdentifier = claimsIdentity.FindFirst(AthleteIdentifier);
+                    var athleteIdentifier = int.Parse(claimsIdentity.FindFirst(AthleteIdentifier).Value);
 
-                    var athlete = await _stravaService.GetOrCreateAthlete(accessToken, int.Parse(athleteIdentifier.Value));
+                    var athleteName = $"{claimsIdentity.FindFirst(FirstName).Value} {claimsIdentity.FindFirst(LastName).Value}";
 
-                    athlete.Name = $"{claimsIdentity.FindFirst(FirstName).Value} {claimsIdentity.FindFirst(LastName).Value}";
+                    var athlete = await _stravaService.GetOrCreateAthlete(accessToken, athleteIdentifier, athleteName);
 
                     athlete.StravaJoinDate = DateTime.ParseExact(claimsIdentity.FindFirst(StravaJoinDate).Value, "MM/dd/yyyy hh:mm:ss", null);
 

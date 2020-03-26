@@ -6,6 +6,7 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using ExerciseDaemon.Signup.Models.Strava;
 using Newtonsoft.Json;
+using static ExerciseDaemon.Signup.Constants.DocumentProperties;
 
 namespace ExerciseDaemon.Signup.Repositories
 {
@@ -33,7 +34,7 @@ namespace ExerciseDaemon.Signup.Repositories
             _athletesTable = Table.LoadTable(dynamoDbClient, AthletesTableName);
         }
 
-        public async Task CreateAthlete(Athlete athlete)
+        public async Task CreateOrUpdateAthlete(Athlete athlete)
         {
             var asJson = JsonConvert.SerializeObject(athlete);
 
@@ -46,7 +47,7 @@ namespace ExerciseDaemon.Signup.Repositories
         {
             var config = new GetItemOperationConfig
             {
-                AttributesToGet = new List<string> { "Id", "SignupDateTimeUtc", "LatestActivityDateTimeUtc" },
+                AttributesToGet = new List<string> { Id, Name, AccessToken, SignupDateTimeUtc, LatestActivityId },
                 ConsistentRead = true
             };
 

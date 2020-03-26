@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExerciseDaemon.Signup.ExternalServices;
@@ -11,12 +12,14 @@ namespace ExerciseDaemon.Signup.BackgroundWorker
     {
         private const int FrequencySeconds = 300;
 
+        private readonly StravaService _stravaService;
         private readonly AthleteRepository _athleteRepository;
         private readonly SlackService _slackService;
         private Timer _timer;
 
-        public TimedBackgroundWorker(AthleteRepository athleteRepository, SlackService slackService)
+        public TimedBackgroundWorker(StravaService stravaService, AthleteRepository athleteRepository, SlackService slackService)
         {
+            _stravaService = stravaService;
             _athleteRepository = athleteRepository;
             _slackService = slackService;
         }
@@ -30,16 +33,24 @@ namespace ExerciseDaemon.Signup.BackgroundWorker
 
         private void DoWork(object state)
         {
-            Console.WriteLine($"Background worker process ran: {DateTime.UtcNow:yyyy-MM-dd hh:mm:ss}");
-
-            var lastRan = DateTime.UtcNow.AddSeconds(-FrequencySeconds);
+            Console.WriteLine($"Background worker process started: {DateTime.UtcNow:yyyy-MM-dd hh:mm:ss}");
 
             var athletes = _athleteRepository.GetAthletes().Result;
 
             foreach (var athlete in athletes)
             {
-                if (athlete.LatestActivityDateTimeUtc.HasValue && athlete.LatestActivityDateTimeUtc.Value > lastRan)
-                { }
+                var activities = _stravaService.GetRecentActivities(athlete.AccessToken).Result;
+
+                if (activities.Any() && athlete.LatestActivityId.HasValue && athlete.LatestActivityId.Value != activities.First().Id)
+                {
+                    var latestActivity = activities.First();
+
+                    athlete.LatestActivityId = latestActivity.Id;
+
+                    _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
+
+                    _slackService.PostSlackMessage($"{athlete.Name} just completed a {latestActivity.Type}. Nice work!").Wait();
+                }
             }
         }
 

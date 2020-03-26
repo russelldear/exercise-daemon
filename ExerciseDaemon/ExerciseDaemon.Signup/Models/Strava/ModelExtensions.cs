@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Amazon.DynamoDBv2.DocumentModel;
+using static ExerciseDaemon.Signup.Constants.DocumentProperties;
 
 namespace ExerciseDaemon.Signup.Models.Strava
 {
@@ -10,9 +11,11 @@ namespace ExerciseDaemon.Signup.Models.Strava
         {
             return new Athlete
             {
-                Id = int.Parse(document["Id"]),
-                SignupDateTimeUtc = DateTime.Parse(document["SignupDateTimeUtc"]),
-                LatestActivityDateTimeUtc = DateTime.Parse(document["LatestActivityDateTimeUtc"])
+                Id = int.Parse(document[Id]),
+                Name = document[Name].ToString(),
+                AccessToken = document[AccessToken].ToString(),
+                SignupDateTimeUtc = DateTime.Parse(document[SignupDateTimeUtc]),
+                LatestActivityId = long.Parse(document[LatestActivityId])
             };
         }
 

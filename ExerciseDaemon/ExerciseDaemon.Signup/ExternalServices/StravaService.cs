@@ -13,9 +13,11 @@ namespace ExerciseDaemon.Signup.ExternalServices
 {
     public class StravaService
     {
+        private const int DaysOfActivities = 7;
+
         private readonly AthleteRepository _athleteRepository;
         private readonly SlackService _slackService;
-        private HttpClient _client;
+        private readonly HttpClient _client;
 
         public StravaService(AthleteRepository athleteRepository, SlackService slackService)
         {
@@ -25,7 +27,7 @@ namespace ExerciseDaemon.Signup.ExternalServices
             _client = new HttpClient();
         }
 
-        public async Task<AthleteViewModel> GetOrCreateAthlete(string accessToken, int athleteIdentifier)
+        public async Task<AthleteViewModel> GetOrCreateAthlete(string accessToken, int athleteIdentifier, string name)
         {
             var activities = await GetRecentActivities(accessToken);
 
@@ -34,8 +36,10 @@ namespace ExerciseDaemon.Signup.ExternalServices
             var athlete = new AthleteViewModel
             {
                 Id = athleteIdentifier,
+                Name = name,
+                AccessToken = accessToken,
                 SignupDateTimeUtc = DateTime.UtcNow,
-                LatestActivityDateTimeUtc = latestActivity?.StartDateLocal,
+                LatestActivityId = latestActivity?.Id,
                 Activities = activities
             };
 
@@ -43,7 +47,7 @@ namespace ExerciseDaemon.Signup.ExternalServices
 
             if (existingAthlete == null)
             {
-                await _athleteRepository.CreateAthlete(athlete);
+                await _athleteRepository.CreateOrUpdateAthlete(athlete);
 
                 var retrievedAthlete = await GetAthlete(accessToken);
 
@@ -71,13 +75,13 @@ namespace ExerciseDaemon.Signup.ExternalServices
             return null;
         }
 
-        private async Task<List<Activity>> GetRecentActivities(string accessToken)
+        public async Task<List<Activity>> GetRecentActivities(string accessToken)
         {
             var activities = new List<Activity>();
 
-            var yesterday = DateTime.UtcNow.AddDays(-30).Date;
+            var since = DateTime.UtcNow.AddDays(-DaysOfActivities).Date;
 
-            var timestamp = (int) (yesterday.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            var timestamp = (int) (since.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"https://www.strava.com/api/v3/athlete/activities?after={timestamp}");
 

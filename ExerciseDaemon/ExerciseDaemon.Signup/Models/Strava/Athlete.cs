@@ -6,8 +6,12 @@ namespace ExerciseDaemon.Signup.Models.Strava
     {
         public int Id { get; set; }
 
+        public string Name { get; set; }
+
+        public string AccessToken { get; set; }
+
         public DateTime SignupDateTimeUtc { get; set; }
 
-        public DateTime? LatestActivityDateTimeUtc { get; set; }
+        public long? LatestActivityId { get; set; }
     }
 }
