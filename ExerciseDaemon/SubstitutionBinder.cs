@@ -8,11 +8,11 @@ namespace ExerciseDaemon
 {
     public interface ISubstitutionBinder
     {
-        StravaSettings BuildStravaSettings(IServiceCollection services);
+        StravaSettings BuildStravaSettings();
         
-        DynamoDbSettings BuildDynamoDbSettings(IServiceCollection services);
+        DynamoDbSettings BuildDynamoDbSettings();
 
-        SlackSettings BuildSlackSettings(IServiceCollection services);
+        SlackSettings BuildSlackSettings();
     }
 
     public class SubstitutionBinder : ISubstitutionBinder
@@ -24,9 +24,9 @@ namespace ExerciseDaemon
             _configuration = configuration;
         }
 
-        public StravaSettings BuildStravaSettings(IServiceCollection services)
+        public StravaSettings BuildStravaSettings()
         {
-            StravaSettings stravaSettings = new StravaSettings();
+            var stravaSettings = new StravaSettings();
 
             try
             {
@@ -46,14 +46,14 @@ namespace ExerciseDaemon
             return stravaSettings;
         }
 
-        public DynamoDbSettings BuildDynamoDbSettings(IServiceCollection services)
+        public DynamoDbSettings BuildDynamoDbSettings()
         {
             return _configuration.GetSection("DynamoDb").Get<DynamoDbSettings>();
         }
 
-        public SlackSettings BuildSlackSettings(IServiceCollection services)
+        public SlackSettings BuildSlackSettings()
         {
-            SlackSettings slackSettings = new SlackSettings();
+            var slackSettings = new SlackSettings();
 
             try
             {

@@ -32,7 +32,7 @@ namespace ExerciseDaemon.Controllers
 
                     var athlete = await _stravaService.GetOrCreateAthlete(accessToken, athleteIdentifier, athleteName);
 
-                    athlete.StravaJoinDate = DateTime.ParseExact(claimsIdentity.FindFirst(StravaJoinDate).Value, "MM/dd/yyyy hh:mm:ss", null);
+                    athlete.StravaJoinDate = DateTime.Parse(claimsIdentity.FindFirst(StravaJoinDate).Value);
 
                     return View(athlete);
                 }

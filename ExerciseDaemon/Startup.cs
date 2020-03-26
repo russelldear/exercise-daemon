@@ -24,13 +24,13 @@ namespace ExerciseDaemon
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var stravaSettings = _substitutionBinder.BuildStravaSettings(services);
+            var stravaSettings = _substitutionBinder.BuildStravaSettings();
             services.TryAddSingleton(stravaSettings);
 
-            var dynamoDbSettings = _substitutionBinder.BuildDynamoDbSettings(services);
+            var dynamoDbSettings = _substitutionBinder.BuildDynamoDbSettings();
             services.TryAddSingleton(dynamoDbSettings);
 
-            var slackSettings = _substitutionBinder.BuildSlackSettings(services);
+            var slackSettings = _substitutionBinder.BuildSlackSettings();
             services.TryAddSingleton(slackSettings);
             
             services.TryAddSingleton<StravaService>();
