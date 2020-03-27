@@ -24,35 +24,35 @@ namespace ExerciseDaemon
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //var stravaSettings = _substitutionBinder.BuildStravaSettings();
-            //services.TryAddSingleton(stravaSettings);
+            var stravaSettings = _substitutionBinder.BuildStravaSettings();
+            services.TryAddSingleton(stravaSettings);
 
-            //var dynamoDbSettings = _substitutionBinder.BuildDynamoDbSettings();
-            //services.TryAddSingleton(dynamoDbSettings);
+            var dynamoDbSettings = _substitutionBinder.BuildDynamoDbSettings();
+            services.TryAddSingleton(dynamoDbSettings);
 
-            //var slackSettings = _substitutionBinder.BuildSlackSettings();
-            //services.TryAddSingleton(slackSettings);
+            var slackSettings = _substitutionBinder.BuildSlackSettings();
+            services.TryAddSingleton(slackSettings);
 
-            //services.TryAddSingleton<AthleteRepository>();
-            //services.TryAddSingleton<StravaService>();
-            //services.TryAddSingleton<SlackService>();
+            services.TryAddSingleton<AthleteRepository>();
+            services.TryAddSingleton<StravaService>();
+            services.TryAddSingleton<SlackService>();
 
-            //services.AddAuthentication(options =>
-            //{
-            //    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            //    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            //})
-            //.AddCookie()
-            //.AddStrava(options =>
-            //{
-            //    options.ClientId = stravaSettings.ClientId.ToString();
-            //    options.ClientSecret = stravaSettings.ClientSecret;
-            //    options.Scope.Remove("public");
-            //    options.Scope.Add("profile:read_all");
-            //    options.Scope.Add("read");
-            //    options.Scope.Add("activity:read");
-            //    options.Scope.Add("activity:read_all");
-            //});
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
+            .AddCookie()
+            .AddStrava(options =>
+            {
+                options.ClientId = stravaSettings.ClientId.ToString();
+                options.ClientSecret = stravaSettings.ClientSecret;
+                options.Scope.Remove("public");
+                options.Scope.Add("profile:read_all");
+                options.Scope.Add("read");
+                options.Scope.Add("activity:read");
+                options.Scope.Add("activity:read_all");
+            });
 
             services.AddMvc();
         }
@@ -70,7 +70,7 @@ namespace ExerciseDaemon
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            //app.UseAuthentication();
+            app.UseAuthentication();
 
             app.UseStaticFiles();
 
