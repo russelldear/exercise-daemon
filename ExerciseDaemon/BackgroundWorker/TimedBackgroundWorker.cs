@@ -33,10 +33,6 @@ namespace ExerciseDaemon.BackgroundWorker
 
         private void DoWork(object state)
         {
-            Console.WriteLine($"Background worker process started: {DateTime.UtcNow:yyyy-MM-dd hh:mm:ss}");
-
-            _slackService.PostSlackMessage($"Background worker process started: {DateTime.UtcNow:yyyy-MM-dd hh:mm:ss}").Wait();
-
             var athletes = _athleteRepository.GetAthletes().Result;
 
             foreach (var athlete in athletes)
