@@ -20,7 +20,7 @@ namespace ExerciseDaemon
                 {
                     collection.TryAddSingleton<ISubstitutionBinder, SubstitutionBinder>();
 
-                    //collection.AddHostedService<TimedBackgroundWorker>();
+                    collection.AddHostedService<TimedBackgroundWorker>();
                 })
                 .UseKestrel(options => { options.Listen(IPAddress.Any, 5236); })
                 .UseUrls("http://*:5236")
