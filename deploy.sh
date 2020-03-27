@@ -12,7 +12,7 @@ TASK=$(aws ecs describe-task-definition --task-definition exercise-daemon --outp
 aws ecs register-task-definition --family exercise-daemon --container-definitions "$TASK" --task-role-arn arn:aws:iam::540629508292:role/ecsTaskExecutionRole --execution-role-arn arn:aws:iam::540629508292:role/ecsTaskExecutionRole
 
 REVISION=$(aws ecs describe-task-definition --task-definition exercise-daemon --output json  | jq -r '.taskDefinition.revision')
-aws ecs update-service --cluster default-ec2 --service exercise-daemon --task-definition exercise-daemon:$REVISION
+aws ecs update-service --cluster secondary-ec2 --service exercise-daemon --task-definition exercise-daemon:$REVISION
 
 #run chmod +x deploy.sh first if you have permissions issues
 
