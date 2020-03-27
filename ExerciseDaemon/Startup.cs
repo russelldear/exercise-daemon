@@ -78,7 +78,7 @@ namespace ExerciseDaemon
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Config}/{action=Index}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
