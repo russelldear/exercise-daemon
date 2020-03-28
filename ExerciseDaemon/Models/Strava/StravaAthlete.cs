@@ -1,6 +1,6 @@
 ﻿namespace ExerciseDaemon.Models.Strava
 {
-    public class FullAthlete
+    public class StravaAthlete
     {
         public long Id { get; set; }
 

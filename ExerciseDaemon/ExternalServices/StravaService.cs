@@ -57,22 +57,11 @@ namespace ExerciseDaemon.ExternalServices
             return athlete;
         }
 
-        private async Task<FullAthlete> GetAthlete(string accessToken)
+        private async Task<StravaAthlete> GetAthlete(string accessToken)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"https://www.strava.com/api/v3/athlete");
 
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-            var response = await _client.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var activitiesResponse = await response.Content.ReadAsStringAsync();
-
-                return JsonConvert.DeserializeObject<FullAthlete>(activitiesResponse);
-            }
-
-            return null;
+            return await SendStravaRequest<StravaAthlete>(request, accessToken);
         }
 
         public async Task<List<Activity>> GetRecentActivities(string accessToken)
@@ -85,18 +74,25 @@ namespace ExerciseDaemon.ExternalServices
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"https://www.strava.com/api/v3/athlete/activities?after={timestamp}");
 
+            return await SendStravaRequest<List<Activity>>(request, accessToken);
+        }
+
+        private async Task<T> SendStravaRequest<T>(HttpRequestMessage request, string accessToken)
+        {
+            T result = default(T);
+
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             var response = await _client.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
-                var activitiesResponse = await response.Content.ReadAsStringAsync();
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                activities = JsonConvert.DeserializeObject<List<Activity>>(activitiesResponse);
+                result = JsonConvert.DeserializeObject<T>(responseString);
             }
 
-            return activities;
+            return result;
         }
     }
 }
