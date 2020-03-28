@@ -6,28 +6,33 @@
 
 @if (!User.Identity.IsAuthenticated)
 {
-    <p class="lead">Connect your Strava account to get motivated to exercise during lockdown!</p>
+    <p class="lead">Exercise your lockdown demons.</p> <!--Connect your Strava account to get motivated to exercise during lockdown!-->
     <div class="row">
         <div class="col-lg-12">
-            <div class="jumbotron">
-                <div style="margin: 0 auto; width: 600px; text-align: center;">
-                    <a class="strava-connect" asp-controller="Strava" asp-action="Connect">
-                        <img src="/images/btn_strava_connectwith_orange.png" />
-                    </a>
-                </div>
-            </div>
+            <p>
+                The benefits of regular exercise to physical and mental health are well known, and the coronavirus lockdown is
+                <a href="https://www.pcmag.com/news/fitbit-sees-global-step-counts-drop-as-coronavirus-forces-people-to-stay">
+                    reducing the daily step count of New Zealand (and the rest of the world)</a>.
+                Connect your Strava account to get motivated via a dedicated Xero Slack channel.
+            </p>
+            <p>
+                <a class="strava-connect" asp-controller="Strava" asp-action="Connect">
+                    <img src="/images/btn_strava_connectwith_orange.png" />
+                </a>
+            </p>
         </div>
     </div>
-}
-else
-{
+    }
+    else
+    {
     <p class="lead">You're connected! Woo!</p>
+    <p><b><a target="_blank" href="https://app.slack.com/client/T49PT3R50/G010P57B539/">Click here</a> to join the Xero slack channel that will keep you motivated to stay fit during lockdown.</b></p>
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">Athlete</div>
                 <div class="panel-body">
-                    <p><strong>@Model.Name</strong> &ndash; Joined Strava on : @Model.StravaJoinDate.ToString("D")</p>
+                    <p><strong>@Model.Name</strong> &ndash; Joined Strava on @Model.StravaJoinDate.ToString("D")</p>
                 </div>
             </div>
         </div>
@@ -40,10 +45,10 @@ else
                 <div class="panel-body">
                     @foreach (var activity in Model.Activities.OrderByDescending(a => a.StartDateLocal))
                     {
-                        <p><strong>@activity.Type</strong> &ndash; @activity.StartDateLocal.ToString("f")</p>
+                        <p><strong>@activity.Type</strong> &ndash; @activity.StartDateLocal.ToString("F")</p>
                     }
                 </div>
             </div>
         </div>
     </div>
-}
+    }

@@ -1,6 +1,26 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
+﻿html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 50px 0 0 0;
+    background-color: black;
+    color: white;
+}
+
+div#bg {
+    width: 800px;
+    height: 100%;
+    max-height: 100%;
+    margin: 0 auto;
+    padding: 50px 0 0 0;
+    background-image: url('/images/background-fire.jpg');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
 }
 
 /* Wrapping element */
@@ -17,4 +37,32 @@
     .carousel-caption {
         display: none;
     }
+}
+
+.headerLine {
+    font-family: 'Roboto', sans-serif;
+    font-size: 60px;
+    font-weight: 900;
+}
+
+a, a:hover, a:visited {
+    color: white;
+    text-decoration: underline;
+}
+
+.panel-heading,
+.panel-default > .panel-heading,
+.panel-body {
+    color: white;
+    background-color: #333;
+}
+
+.panel-default > .panel-heading {
+    border-color: white;
+}
+
+.panel-default,
+.panel-heading,
+.panel-body {
+    border-color: #333;
 }

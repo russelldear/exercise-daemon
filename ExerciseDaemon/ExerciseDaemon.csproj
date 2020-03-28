@@ -25,4 +25,10 @@
     <ProjectReference Include="..\AspNetCore.OAuth.Provider.Strava\AspNetCore.OAuth.Provider.Strava.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\images\background-fire.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wwwroot\images\background-fire.jpg" />
+  </ItemGroup>
 </Project>
