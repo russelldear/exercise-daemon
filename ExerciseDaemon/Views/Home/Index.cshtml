@@ -26,7 +26,7 @@
     else
     {
     <p class="lead">You're connected! Woo!</p>
-    <p><b><a target="_blank" href="https://app.slack.com/client/T49PT3R50/G010P57B539/">Click here</a> to join the Xero slack channel that will keep you motivated to stay fit during lockdown.</b></p>
+    <p>Now you just need to <b><a target="_blank" href="https://app.slack.com/client/T49PT3R50/G010P57B539/">click here</a></b> to join the Xero slack channel that will keep you motivated to stay fit during lockdown.</p>
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -43,9 +43,16 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Latest Activities</div>
                 <div class="panel-body">
-                    @foreach (var activity in Model.Activities.OrderByDescending(a => a.StartDateLocal))
+                    @if (Model.Activities.Any())
                     {
-                        <p><strong>@activity.Type</strong> &ndash; @activity.StartDateLocal.ToString("F")</p>
+                        @foreach (var activity in Model.Activities.OrderByDescending(a => a.StartDateLocal))
+                        {
+                            <p><strong>@activity.Type</strong> &ndash; @activity.StartDateLocal.ToString("F")</p>
+                        }
+                    }
+                    else
+                    {
+                        <p>None. Get exercising!</p>
                     }
                 </div>
             </div>

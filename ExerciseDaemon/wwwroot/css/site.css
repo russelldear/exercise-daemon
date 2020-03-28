@@ -17,7 +17,7 @@ div#bg {
     height: 100%;
     max-height: 100%;
     margin: 0 auto;
-    padding: 50px 0 0 0;
+    padding: 30px 0 0 0;
     background-image: url('/images/background-fire.jpg');
     background-size: 100% 100%;
     background-repeat: no-repeat;
@@ -37,6 +37,10 @@ div#bg {
     .carousel-caption {
         display: none;
     }
+}
+
+.navbar-inverse {
+    background-color: black;
 }
 
 .headerLine {
