@@ -15,6 +15,8 @@ namespace ExerciseDaemon.ExternalServices
     {
         private const int DaysOfActivities = 7;
 
+        private readonly Random _random = new Random();
+
         private readonly AthleteRepository _athleteRepository;
         private readonly SlackService _slackService;
         private readonly HttpClient _client;
@@ -51,7 +53,27 @@ namespace ExerciseDaemon.ExternalServices
 
                 var retrievedAthlete = await GetAthlete(accessToken);
 
-                await _slackService.PostSlackMessage($"Welcome, {retrievedAthlete.FirstName} {retrievedAthlete.LastName}!");
+                var welcomeString = $"Welcome, {retrievedAthlete.FirstName} {retrievedAthlete.LastName}! ";
+
+                if (latestActivity != null)
+                {
+                    var nowLocal = DateTime.UtcNow.AddSeconds(latestActivity.UtcOffset);
+
+                    if (latestActivity.StartDateLocal >= nowLocal.Date)
+                    {
+                        welcomeString += $"Hope that {latestActivity.Type.ToLower()} today was good. Great work getting busy!";
+                    }
+                    else
+                    {
+                        welcomeString += $"Good to see that {latestActivity.Type.ToLower()} on {latestActivity.StartDateLocal.DayOfWeek} got you moving. Time for another one soon?";
+                    }
+                }
+                else
+                {
+                    welcomeString += "It doesn't look like you've logged any Strava activities in the last week. Might be time for a wee bit of exercise?";
+                }
+
+                await _slackService.PostSlackMessage(welcomeString);
             }
 
             return athlete;
