@@ -1,5 +1,6 @@
 ﻿using AspNetCore.OAuth.Provider.Strava;
 using ExerciseDaemon.ExternalServices;
+using ExerciseDaemon.Helpers;
 using ExerciseDaemon.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -36,6 +37,7 @@ namespace ExerciseDaemon
             services.TryAddSingleton<AthleteRepository>();
             services.TryAddSingleton<StravaService>();
             services.TryAddSingleton<SlackService>();
+            services.TryAddSingleton<StatementRandomiser>();
 
             services.AddAuthentication(options =>
             {

@@ -4,27 +4,29 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using ExerciseDaemon.Helpers;
 using ExerciseDaemon.Models;
 using ExerciseDaemon.Models.Strava;
 using ExerciseDaemon.Repositories;
 using Newtonsoft.Json;
+using static ExerciseDaemon.Constants.StatementSetKeys;
 
 namespace ExerciseDaemon.ExternalServices
 {
     public class StravaService
     {
         private const int DaysOfActivities = 7;
-
-        private readonly Random _random = new Random();
-
+        
         private readonly AthleteRepository _athleteRepository;
         private readonly SlackService _slackService;
+        private readonly StatementRandomiser _sr;
         private readonly HttpClient _client;
 
-        public StravaService(AthleteRepository athleteRepository, SlackService slackService)
+        public StravaService(AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr)
         {
             _athleteRepository = athleteRepository;
             _slackService = slackService;
+            _sr = sr;
 
             _client = new HttpClient();
         }
@@ -61,16 +63,16 @@ namespace ExerciseDaemon.ExternalServices
 
                     if (latestActivity.StartDateLocal >= nowLocal.Date)
                     {
-                        welcomeString += $"Hope that {latestActivity.Type.ToLower()} today was good. Great work getting busy!";
+                        welcomeString += string.Format(_sr.Get(WelcomeTodayPrompts), latestActivity.Type.ToLower());
                     }
                     else
                     {
-                        welcomeString += $"Good to see that {latestActivity.Type.ToLower()} on {latestActivity.StartDateLocal.DayOfWeek} got you moving. Time for another one soon?";
+                        welcomeString += string.Format(_sr.Get(WelcomeRecentPrompts), latestActivity.Type.ToLower(), latestActivity.StartDateLocal.DayOfWeek);
                     }
                 }
                 else
                 {
-                    welcomeString += "It doesn't look like you've logged any Strava activities in the last week. Might be time for a wee bit of exercise?";
+                    welcomeString += _sr.Get(WelcomeNeverPrompts);
                 }
 
                 await _slackService.PostSlackMessage(welcomeString);

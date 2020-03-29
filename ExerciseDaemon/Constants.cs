@@ -18,5 +18,12 @@
             public const string SignupDateTimeUtc = "SignupDateTimeUtc";
             public const string LatestActivityId = "LatestActivityId";
         }
+
+        public static class StatementSetKeys
+        {
+            public const string WelcomeTodayPrompts = "WelcomeTodayPrompts";
+            public const string WelcomeRecentPrompts = "WelcomeRecentPrompts";
+            public const string WelcomeNeverPrompts = "WelcomeNeverPrompts";
+        }
     }
 }
