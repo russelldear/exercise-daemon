@@ -24,6 +24,7 @@
             public const string WelcomeTodayPrompts = "WelcomeTodayPrompts";
             public const string WelcomeRecentPrompts = "WelcomeRecentPrompts";
             public const string WelcomeNeverPrompts = "WelcomeNeverPrompts";
+            public const string RecordNewActivity = "RecordNewActivity";
         }
     }
 }

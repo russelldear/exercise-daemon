@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExerciseDaemon.ExternalServices;
+using ExerciseDaemon.Helpers;
 using ExerciseDaemon.Repositories;
 using Microsoft.Extensions.Hosting;
+using static ExerciseDaemon.Constants.StatementSetKeys;
 
 namespace ExerciseDaemon.BackgroundWorker
 {
@@ -15,13 +17,15 @@ namespace ExerciseDaemon.BackgroundWorker
         private readonly StravaService _stravaService;
         private readonly AthleteRepository _athleteRepository;
         private readonly SlackService _slackService;
+        private readonly StatementRandomiser _sr;
         private Timer _timer;
 
-        public TimedBackgroundWorker(StravaService stravaService, AthleteRepository athleteRepository, SlackService slackService)
+        public TimedBackgroundWorker(StravaService stravaService, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr)
         {
             _stravaService = stravaService;
             _athleteRepository = athleteRepository;
             _slackService = slackService;
+            _sr = sr;
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
@@ -53,7 +57,7 @@ namespace ExerciseDaemon.BackgroundWorker
 
                         _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
 
-                        _slackService.PostSlackMessage($"{athlete.Name} just completed a {latestActivity.Type}. Nice work!").Wait();
+                        _slackService.PostSlackMessage(string.Format(_sr.Get(RecordNewActivity), athlete.Name, latestActivity.Type)).Wait();
                     }
                 }
             }

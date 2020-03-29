@@ -29,12 +29,20 @@ namespace ExerciseDaemon.Helpers
             "It doesn't look like you've logged any Strava activities in the last week. Might be time for a wee bit of exercise?",
             "No Strava activities for over a week! Got time for one today?"
         };
+        
+        private readonly List<string> _recordNewActivity = new List<string>
+        {
+            "{0} just completed a {1}. Great work!",
+            "Yusss! Spotted you smashing out that {1}, {0}. Sweetbix!",
+            "One more {1} for the record books, {0}. Nice one!",
+        };
 
         public StatementRandomiser()
         {
             _statementBank.Add(WelcomeTodayPrompts, _welcomeTodayPrompts);
             _statementBank.Add(WelcomeRecentPrompts, _welcomeRecentPrompts);
             _statementBank.Add(WelcomeNeverPrompts, _welcomeNeverPrompts);
+            _statementBank.Add(RecordNewActivity, _recordNewActivity);
         }
 
         public string Get(string key)
