@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExerciseDaemon.ExternalServices;
 using ExerciseDaemon.Helpers;
+using ExerciseDaemon.Models.Strava;
 using ExerciseDaemon.Repositories;
 using Microsoft.Extensions.Hosting;
 using static ExerciseDaemon.Constants.StatementSetKeys;
@@ -28,6 +29,10 @@ namespace ExerciseDaemon.BackgroundWorker
             _sr = sr;
         }
 
+        private DateTime AWeekEarlier => DateTime.UtcNow.AddDays(-7);
+        
+        private DateTime TwoWeeksEarlier => DateTime.UtcNow.AddDays(-14);
+
         public Task StartAsync(CancellationToken stoppingToken)
         {
             _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(FrequencySeconds));
@@ -41,7 +46,9 @@ namespace ExerciseDaemon.BackgroundWorker
 
             foreach (var athlete in athletes)
             {
-                var activities = _stravaService.GetRecentActivities(athlete.AccessToken).Result;
+                var tokenSet = new TokenSet(athlete.AccessToken, athlete.RefreshToken, athlete.ExpiresAt);
+
+                var activities = _stravaService.GetRecentActivities(tokenSet, athlete.Id).Result;
 
                 if (activities.Any())
                 {
@@ -60,7 +67,45 @@ namespace ExerciseDaemon.BackgroundWorker
                         _slackService.PostSlackMessage(string.Format(_sr.Get(RecordNewActivity), athlete.Name, latestActivity.Type)).Wait();
                     }
                 }
+
+                if (athlete.ReminderCount == 0)
+                {
+                    var dateToCheck = activities.FirstOrDefault()?.StartDate ?? athlete.SignupDateTimeUtc;
+
+                    if (dateToCheck < AWeekEarlier)
+                    {
+                        UpdateReminders(athlete, 1);
+
+                        _slackService.PostSlackMessage(string.Format(_sr.Get(WeekReminder), athlete.Name)).Wait();
+                    }
+                }
+                else if (athlete.ReminderCount == 1)
+                {
+                    if (athlete.LastReminderDateTimeUtc < AWeekEarlier)
+                    {
+                        UpdateReminders(athlete, 2);
+
+                        _slackService.PostSlackMessage(string.Format(_sr.Get(FortnightReminder), athlete.Name)).Wait();
+                    }
+                }
+                else if (athlete.ReminderCount == 2)
+                {
+                    if (athlete.LastReminderDateTimeUtc < TwoWeeksEarlier)
+                    {
+                        UpdateReminders(athlete, 3);
+
+                        _slackService.PostSlackMessage(string.Format(_sr.Get(MonthReminder), athlete.Name)).Wait();
+                    }
+                }
             }
+        }
+
+        private void UpdateReminders(Athlete athlete, int reminderCount)
+        {
+            athlete.ReminderCount = reminderCount;
+            athlete.LastReminderDateTimeUtc = DateTime.UtcNow;
+
+            _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
         }
 
         public Task StopAsync(CancellationToken stoppingToken)

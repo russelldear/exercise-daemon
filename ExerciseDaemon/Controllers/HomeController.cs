@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using ExerciseDaemon.ExternalServices;
 using ExerciseDaemon.Models;
+using ExerciseDaemon.Models.Strava;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using static ExerciseDaemon.Constants.ClaimTypes;
@@ -22,15 +23,20 @@ namespace ExerciseDaemon.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
+                var tokenSet = new TokenSet
+                {
+                    AccessToken = await HttpContext.GetTokenAsync("access_token"),
+                    RefreshToken = await HttpContext.GetTokenAsync("refresh_token"),
+                    ExpiresAt = DateTime.Parse(await HttpContext.GetTokenAsync("expires_at"))
+                };
 
-                if (accessToken != null && User.Identity is ClaimsIdentity claimsIdentity)
+                if (!string.IsNullOrWhiteSpace(tokenSet.AccessToken) && User.Identity is ClaimsIdentity claimsIdentity)
                 {
                     var athleteIdentifier = int.Parse(claimsIdentity.FindFirst(AthleteIdentifier).Value);
 
                     var athleteName = $"{claimsIdentity.FindFirst(FirstName).Value} {claimsIdentity.FindFirst(LastName).Value}";
 
-                    var athlete = await _stravaService.GetOrCreateAthlete(accessToken, athleteIdentifier, athleteName);
+                    var athlete = await _stravaService.GetOrCreateAthlete(tokenSet, athleteIdentifier, athleteName);
 
                     athlete.StravaJoinDate = DateTime.Parse(claimsIdentity.FindFirst(StravaJoinDate).Value);
 

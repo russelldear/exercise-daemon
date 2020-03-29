@@ -15,7 +15,11 @@
             public const string Id = "Id";
             public const string Name = "Name";
             public const string AccessToken = "AccessToken";
+            public const string RefreshToken = "RefreshToken";
+            public const string ExpiresAt = "ExpiresAt";
             public const string SignupDateTimeUtc = "SignupDateTimeUtc";
+            public const string ReminderCount = "ReminderCount";
+            public const string LastReminderDateTimeUtc = "LastReminderDateTimeUtc";
             public const string LatestActivityId = "LatestActivityId";
         }
 
@@ -25,6 +29,9 @@
             public const string WelcomeRecentPrompts = "WelcomeRecentPrompts";
             public const string WelcomeNeverPrompts = "WelcomeNeverPrompts";
             public const string RecordNewActivity = "RecordNewActivity";
+            public const string WeekReminder = "WeekReminder";
+            public const string FortnightReminder = "FortnightReminder";
+            public const string MonthReminder = "MonthReminder";
         }
     }
 }

@@ -21,7 +21,11 @@ namespace ExerciseDaemon.Models.Strava
                 Id = int.Parse(document[Id]),
                 Name = document[Name].ToString(),
                 AccessToken = document[AccessToken].ToString(),
-                SignupDateTimeUtc = DateTime.Parse(document[SignupDateTimeUtc]),
+                RefreshToken = document[RefreshToken].ToString(),
+                ExpiresAt = DateTime.Parse(document[ExpiresAt]).ToUniversalTime(),
+                SignupDateTimeUtc = DateTime.Parse(document[SignupDateTimeUtc]).ToUniversalTime(),
+                ReminderCount = int.Parse(document[ReminderCount]),
+                LastReminderDateTimeUtc = DateTime.Parse(document[LastReminderDateTimeUtc]).ToUniversalTime(),
                 LatestActivityId = latestActivityId
             };
         }
