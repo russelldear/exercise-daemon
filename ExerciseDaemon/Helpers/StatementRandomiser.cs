@@ -14,7 +14,8 @@ namespace ExerciseDaemon.Helpers
         private readonly List<string> _welcomeTodayPrompts = new List<string>
         {
             "Hope that {0} today was good. Great work getting busy!",
-            "I bet that {0} today shook out some cobwebs. Nice one!"
+            "I bet that {0} today shook out some cobwebs. Nice one!",
+            "Your body and mind will thank you for that {0} today. :fistbump:"
         };
 
         private readonly List<string> _welcomeRecentPrompts = new List<string>

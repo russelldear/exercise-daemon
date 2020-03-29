@@ -39,15 +39,22 @@ namespace ExerciseDaemon.BackgroundWorker
             {
                 var activities = _stravaService.GetRecentActivities(athlete.AccessToken).Result;
 
-                if (activities.Any() && athlete.LatestActivityId.HasValue && athlete.LatestActivityId.Value != activities.First().Id)
+                if (activities.Any())
                 {
-                    var latestActivity = activities.First();
+                    var hasNoRecordedActivities = !athlete.LatestActivityId.HasValue;
 
-                    athlete.LatestActivityId = latestActivity.Id;
+                    var hasUnrecordedActivity = athlete.LatestActivityId.HasValue && athlete.LatestActivityId.Value != activities.First().Id;
 
-                    _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
+                    if (hasNoRecordedActivities || hasUnrecordedActivity)
+                    {
+                        var latestActivity = activities.First();
 
-                    _slackService.PostSlackMessage($"{athlete.Name} just completed a {latestActivity.Type}. Nice work!").Wait();
+                        athlete.LatestActivityId = latestActivity.Id;
+
+                        _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
+
+                        _slackService.PostSlackMessage($"{athlete.Name} just completed a {latestActivity.Type}. Nice work!").Wait();
+                    }
                 }
             }
         }

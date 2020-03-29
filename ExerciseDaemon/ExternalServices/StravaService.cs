@@ -35,7 +35,7 @@ namespace ExerciseDaemon.ExternalServices
         {
             var activities = await GetRecentActivities(accessToken);
 
-            var latestActivity = activities.OrderByDescending(a => a.StartDateLocal).FirstOrDefault();
+            var latestActivity = activities.FirstOrDefault();
 
             var athlete = new AthleteViewModel
             {
@@ -97,8 +97,10 @@ namespace ExerciseDaemon.ExternalServices
             var timestamp = (int) (since.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"https://www.strava.com/api/v3/athlete/activities?after={timestamp}");
+            
+            var result = await SendStravaRequest<List<Activity>>(request, accessToken);
 
-            return await SendStravaRequest<List<Activity>>(request, accessToken);
+            return result.OrderByDescending(a => a.StartDateLocal).ToList();
         }
 
         private async Task<T> SendStravaRequest<T>(HttpRequestMessage request, string accessToken)

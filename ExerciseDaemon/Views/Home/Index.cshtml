@@ -45,7 +45,7 @@
                 <div class="panel-body">
                     @if (Model.Activities.Any())
                     {
-                        @foreach (var activity in Model.Activities.OrderByDescending(a => a.StartDateLocal))
+                        @foreach (var activity in Model.Activities)
                         {
                             <p><strong>@activity.Type</strong> &ndash; @activity.StartDateLocal.ToString("F")</p>
                         }
