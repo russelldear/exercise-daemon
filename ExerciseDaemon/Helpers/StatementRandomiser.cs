@@ -42,7 +42,7 @@ namespace ExerciseDaemon.Helpers
             "{0} just completed a {1}. Great work!",
             "Yusss! Spotted you smashing out that {1}, {0}. Sweetbix!",
             "One more {1} for the record books, {0}. Nice one!",
-            "A wild {1} appears. You use Strava attack. It's super effective!",
+            "A wild {1} appears. {0} uses Strava attack. It's super effective!",
             "Oof, don't think I could have nailed that {1} as well as you did, {0}. Bloody awesome."
         };
 
