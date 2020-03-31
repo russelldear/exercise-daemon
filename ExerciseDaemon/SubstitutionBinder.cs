@@ -61,11 +61,13 @@ namespace ExerciseDaemon
             }
             catch { }
 
-            if (string.IsNullOrWhiteSpace(slackSettings.BaseUrl))
+            if (string.IsNullOrWhiteSpace(slackSettings.SlackWebhookUrl))
             {
                 slackSettings = new SlackSettings
                 {
-                    BaseUrl = Environment.GetEnvironmentVariable("SlackUrl"),
+                    SlackWebhookUrl = Environment.GetEnvironmentVariable("SlackUrl"),
+                    SlackWorkspaceUrl = Environment.GetEnvironmentVariable("SlackWorkspaceUrl"),
+                    SlackChannelId = Environment.GetEnvironmentVariable("SlackChannelId"),
                     SlackClientId = Environment.GetEnvironmentVariable("SlackClientId"),
                     SlackClientSecret = Environment.GetEnvironmentVariable("SlackClientSecret"),
                     SlackRedirectUri = Environment.GetEnvironmentVariable("SlackRedirectUri")

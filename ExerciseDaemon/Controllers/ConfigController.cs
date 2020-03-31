@@ -47,7 +47,7 @@ namespace ExerciseDaemon.Controllers
             {
                 var slackSettings = _substitutionBinder.BuildSlackSettings();
 
-                config.SlackUrl = slackSettings.BaseUrl;
+                config.SlackUrl = slackSettings.SlackWebhookUrl;
             }
             catch (Exception e)
             {

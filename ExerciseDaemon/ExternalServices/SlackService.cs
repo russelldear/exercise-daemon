@@ -21,7 +21,13 @@ namespace ExerciseDaemon.ExternalServices
 
             var body = new StringContent(bodyString, Encoding.UTF8, "application/json");
 
-            await client.PostAsync(_slackSettings.BaseUrl, body);
+            await client.PostAsync(_slackSettings.SlackWebhookUrl, body);
+        }
+
+        public Task AddUserToChannel(string slackUserid)
+        {
+            return null;
+            //https://slack.com/api/conversations.invite?token=xoxb-1034559977669-1036517533078-GuMykwaKhQ0DJRYV95UE5Sa1&channel=C01150C5VBN&users=U0117FCK687
         }
     }
 }

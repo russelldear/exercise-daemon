@@ -8,6 +8,7 @@ using ExerciseDaemon.Helpers;
 using ExerciseDaemon.Models;
 using ExerciseDaemon.Models.Strava;
 using ExerciseDaemon.Repositories;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using static ExerciseDaemon.Constants.StatementSetKeys;
 
@@ -169,6 +170,8 @@ namespace ExerciseDaemon.ExternalServices
 
         private async Task PostWelcomeMessage(string slackUserid, Activity latestActivity)
         {
+            await _slackService.AddUserToChannel(slackUserid);
+
             var welcomeString = $"Welcome, <@{slackUserid}>! ";
 
             if (latestActivity != null)

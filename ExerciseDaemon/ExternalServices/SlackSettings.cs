@@ -2,7 +2,11 @@
 {
     public class SlackSettings
     {
-        public string BaseUrl { get; set; }
+        public string SlackWebhookUrl { get; set; }
+
+        public string SlackWorkspaceUrl { get; set; }
+
+        public string SlackChannelId { get; set; }
 
         public string SlackClientId { get; set; }
 
