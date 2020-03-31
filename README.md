@@ -1,3 +1,3 @@
 # Exercise Daemon
 
-Get fit or get guilty.
+Get busy during lockdown.
