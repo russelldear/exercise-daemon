@@ -46,7 +46,7 @@ namespace ExerciseDaemon.BackgroundWorker
 
             foreach (var athlete in athletes)
             {
-                var tokenSet = new TokenSet(athlete.AccessToken, athlete.RefreshToken, athlete.ExpiresAt);
+                var tokenSet = new StravaTokenSet(athlete.AccessToken, athlete.RefreshToken, athlete.ExpiresAt);
 
                 var activities = _stravaService.GetRecentActivities(tokenSet, athlete.Id).Result;
 

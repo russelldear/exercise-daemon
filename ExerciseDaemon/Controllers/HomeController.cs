@@ -23,7 +23,14 @@ namespace ExerciseDaemon.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var tokenSet = new TokenSet
+                var slackUserId = Request.Cookies["SlackUserId"];
+
+                if (string.IsNullOrWhiteSpace(slackUserId))
+                {
+                    return RedirectToAction("Connect", "Slack");
+                }
+
+                var tokenSet = new StravaTokenSet
                 {
                     AccessToken = await HttpContext.GetTokenAsync("access_token"),
                     RefreshToken = await HttpContext.GetTokenAsync("refresh_token"),
@@ -36,7 +43,7 @@ namespace ExerciseDaemon.Controllers
 
                     var athleteName = $"{claimsIdentity.FindFirst(FirstName).Value} {claimsIdentity.FindFirst(LastName).Value}";
 
-                    var athlete = await _stravaService.GetOrCreateAthlete(tokenSet, athleteIdentifier, athleteName);
+                    var athlete = await _stravaService.GetOrCreateAthlete(tokenSet, slackUserId, athleteIdentifier, athleteName);
 
                     athlete.StravaJoinDate = DateTime.Parse(claimsIdentity.FindFirst(StravaJoinDate).Value);
 

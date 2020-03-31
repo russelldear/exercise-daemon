@@ -14,6 +14,8 @@ namespace ExerciseDaemon.Models.Strava
 
         public DateTime ExpiresAt { get; set; }
 
+        public string SlackUserId { get; set; }
+
         public DateTime SignupDateTimeUtc { get; set; }
 
         public int ReminderCount { get; set; }

@@ -17,6 +17,7 @@
             public const string AccessToken = "AccessToken";
             public const string RefreshToken = "RefreshToken";
             public const string ExpiresAt = "ExpiresAt";
+            public const string SlackUserId = "SlackUserId";
             public const string SignupDateTimeUtc = "SignupDateTimeUtc";
             public const string ReminderCount = "ReminderCount";
             public const string LastReminderDateTimeUtc = "LastReminderDateTimeUtc";

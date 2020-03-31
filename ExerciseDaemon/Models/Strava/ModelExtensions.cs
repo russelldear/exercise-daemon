@@ -23,6 +23,7 @@ namespace ExerciseDaemon.Models.Strava
                 AccessToken = document[AccessToken].ToString(),
                 RefreshToken = document[RefreshToken].ToString(),
                 ExpiresAt = DateTime.Parse(document[ExpiresAt]).ToUniversalTime(),
+                SlackUserId = document[SlackUserId].ToString(),
                 SignupDateTimeUtc = DateTime.Parse(document[SignupDateTimeUtc]).ToUniversalTime(),
                 ReminderCount = int.Parse(document[ReminderCount]),
                 LastReminderDateTimeUtc = DateTime.Parse(document[LastReminderDateTimeUtc]).ToUniversalTime(),

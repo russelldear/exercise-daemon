@@ -21,6 +21,13 @@ namespace ExerciseDaemon.Controllers
 
         public IActionResult Connected()
         {
+            var slackUserId = Request.Cookies["SlackUserId"];
+
+            if (string.IsNullOrWhiteSpace(slackUserId))
+            {
+                return RedirectToAction("Connect", "Slack");
+            }
+
             return RedirectToAction("Index", "Home");
         }
 

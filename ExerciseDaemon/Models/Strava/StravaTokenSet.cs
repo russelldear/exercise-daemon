@@ -3,12 +3,12 @@ using Newtonsoft.Json;
 
 namespace ExerciseDaemon.Models.Strava
 {
-    public class TokenSet
+    public class StravaTokenSet
     {
-        public TokenSet()
+        public StravaTokenSet()
         { }
 
-        public TokenSet(string accessToken, string refreshToken, DateTime expiresAt)
+        public StravaTokenSet(string accessToken, string refreshToken, DateTime expiresAt)
         {
             AccessToken = accessToken;
             RefreshToken = refreshToken;
