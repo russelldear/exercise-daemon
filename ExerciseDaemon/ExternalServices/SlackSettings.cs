@@ -8,6 +8,8 @@
 
         public string SlackChannelId { get; set; }
 
+        public string SlackBotUserAccessToken { get; set; }
+
         public string SlackClientId { get; set; }
 
         public string SlackClientSecret { get; set; }

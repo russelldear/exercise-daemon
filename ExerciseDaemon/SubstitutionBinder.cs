@@ -68,6 +68,7 @@ namespace ExerciseDaemon
                     SlackWebhookUrl = Environment.GetEnvironmentVariable("SlackUrl"),
                     SlackWorkspaceUrl = Environment.GetEnvironmentVariable("SlackWorkspaceUrl"),
                     SlackChannelId = Environment.GetEnvironmentVariable("SlackChannelId"),
+                    SlackBotUserAccessToken = Environment.GetEnvironmentVariable("SlackBotUserAccessToken"),
                     SlackClientId = Environment.GetEnvironmentVariable("SlackClientId"),
                     SlackClientSecret = Environment.GetEnvironmentVariable("SlackClientSecret"),
                     SlackRedirectUri = Environment.GetEnvironmentVariable("SlackRedirectUri")

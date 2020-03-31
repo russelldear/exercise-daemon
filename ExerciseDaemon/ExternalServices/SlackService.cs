@@ -6,11 +6,16 @@ namespace ExerciseDaemon.ExternalServices
 {
     public class SlackService
     {
+        private const string AddChannelFormat = "https://slack.com/api/conversations.invite?token={0}&channel={1}&users={2}";
+
         private readonly SlackSettings _slackSettings;
+        private readonly HttpClient _client;
 
         public SlackService(SlackSettings slackSettings)
         {
             _slackSettings = slackSettings;
+
+            _client = new HttpClient();
         }
 
         public async Task PostSlackMessage(string message)
@@ -24,10 +29,13 @@ namespace ExerciseDaemon.ExternalServices
             await client.PostAsync(_slackSettings.SlackWebhookUrl, body);
         }
 
-        public Task AddUserToChannel(string slackUserid)
+        public async Task AddUserToChannel(string slackUserId)
         {
-            return null;
-            //https://slack.com/api/conversations.invite?token=xoxb-1034559977669-1036517533078-GuMykwaKhQ0DJRYV95UE5Sa1&channel=C01150C5VBN&users=U0117FCK687
+            var url = string.Format(AddChannelFormat, _slackSettings.SlackBotUserAccessToken, _slackSettings.SlackChannelId, slackUserId);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, url);
+
+            var response = await _client.SendAsync(request);
         }
     }
 }

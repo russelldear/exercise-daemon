@@ -75,8 +75,7 @@ namespace ExerciseDaemon.BackgroundWorker
         {
             var hasNoRecordedActivities = !athlete.LatestActivityId.HasValue;
 
-            var hasUnrecordedActivity =
-                athlete.LatestActivityId.HasValue && athlete.LatestActivityId.Value != activities.First().Id;
+            var hasUnrecordedActivity = athlete.LatestActivityId.HasValue && athlete.LatestActivityId.Value != activities.First().Id;
 
             if (hasNoRecordedActivities || hasUnrecordedActivity)
             {
