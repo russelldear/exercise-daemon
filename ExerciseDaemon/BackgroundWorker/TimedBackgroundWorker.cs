@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,51 +53,72 @@ namespace ExerciseDaemon.BackgroundWorker
 
                 if (activities.Any())
                 {
-                    var hasNoRecordedActivities = !athlete.LatestActivityId.HasValue;
-
-                    var hasUnrecordedActivity = athlete.LatestActivityId.HasValue && athlete.LatestActivityId.Value != activities.First().Id;
-
-                    if (hasNoRecordedActivities || hasUnrecordedActivity)
-                    {
-                        var latestActivity = activities.First();
-
-                        athlete.LatestActivityId = latestActivity.Id;
-
-                        _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
-
-                        _slackService.PostSlackMessage(string.Format(_sr.Get(RecordNewActivity), athlete.Name, latestActivity.Type)).Wait();
-                    }
+                    CheckForNewActivity(athlete, activities);
                 }
 
                 if (athlete.ReminderCount == 0)
                 {
-                    var dateToCheck = activities.FirstOrDefault()?.StartDate ?? athlete.SignupDateTimeUtc;
-
-                    if (dateToCheck < AWeekEarlier)
-                    {
-                        UpdateReminders(athlete, 1);
-
-                        _slackService.PostSlackMessage(string.Format(_sr.Get(WeekReminder), athlete.Name)).Wait();
-                    }
+                    CheckForWeeklyReminder(activities, athlete);
                 }
                 else if (athlete.ReminderCount == 1)
                 {
-                    if (athlete.LastReminderDateTimeUtc < AWeekEarlier)
-                    {
-                        UpdateReminders(athlete, 2);
-
-                        _slackService.PostSlackMessage(string.Format(_sr.Get(FortnightReminder), athlete.Name)).Wait();
-                    }
+                    CheckForFortnightReminder(athlete);
                 }
                 else if (athlete.ReminderCount == 2)
                 {
-                    if (athlete.LastReminderDateTimeUtc < TwoWeeksEarlier)
-                    {
-                        UpdateReminders(athlete, 3);
-
-                        _slackService.PostSlackMessage(string.Format(_sr.Get(MonthReminder), athlete.Name)).Wait();
-                    }
+                    CheckForMonthReminder(athlete);
                 }
+            }
+        }
+
+        private void CheckForNewActivity(Athlete athlete, List<Activity> activities)
+        {
+            var hasNoRecordedActivities = !athlete.LatestActivityId.HasValue;
+
+            var hasUnrecordedActivity =
+                athlete.LatestActivityId.HasValue && athlete.LatestActivityId.Value != activities.First().Id;
+
+            if (hasNoRecordedActivities || hasUnrecordedActivity)
+            {
+                var latestActivity = activities.First();
+
+                athlete.LatestActivityId = latestActivity.Id;
+
+                _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
+
+                _slackService.PostSlackMessage(string.Format(_sr.Get(RecordNewActivity), GetSlackName(athlete), latestActivity.Type)).Wait();
+            }
+        }
+
+        private void CheckForWeeklyReminder(List<Activity> activities, Athlete athlete)
+        {
+            var dateToCheck = activities.FirstOrDefault()?.StartDate ?? athlete.SignupDateTimeUtc;
+
+            if (dateToCheck < AWeekEarlier)
+            {
+                UpdateReminders(athlete, 1);
+
+                _slackService.PostSlackMessage(string.Format(_sr.Get(WeekReminder), GetSlackName(athlete))).Wait();
+            }
+        }
+
+        private void CheckForFortnightReminder(Athlete athlete)
+        {
+            if (athlete.LastReminderDateTimeUtc < AWeekEarlier)
+            {
+                UpdateReminders(athlete, 2);
+
+                _slackService.PostSlackMessage(string.Format(_sr.Get(FortnightReminder), GetSlackName(athlete))).Wait();
+            }
+        }
+
+        private void CheckForMonthReminder(Athlete athlete)
+        {
+            if (athlete.LastReminderDateTimeUtc < TwoWeeksEarlier)
+            {
+                UpdateReminders(athlete, 3);
+
+                _slackService.PostSlackMessage(string.Format(_sr.Get(MonthReminder), GetSlackName(athlete))).Wait();
             }
         }
 
@@ -106,6 +128,11 @@ namespace ExerciseDaemon.BackgroundWorker
             athlete.LastReminderDateTimeUtc = DateTime.UtcNow;
 
             _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
+        }
+
+        private string GetSlackName(Athlete athlete)
+        {
+            return $"<@{athlete.SlackUserId}>";
         }
 
         public Task StopAsync(CancellationToken stoppingToken)

@@ -46,7 +46,7 @@ namespace ExerciseDaemon.Repositories
         {
             var config = new GetItemOperationConfig
             {
-                AttributesToGet = new List<string> { Id, Name, AccessToken, RefreshToken, ExpiresAt, SignupDateTimeUtc, ReminderCount, LastReminderDateTimeUtc, LatestActivityId },
+                AttributesToGet = new List<string> { Id, Name, AccessToken, RefreshToken, ExpiresAt, SlackUserId, SignupDateTimeUtc, ReminderCount, LastReminderDateTimeUtc, LatestActivityId },
                 ConsistentRead = true
             };
 

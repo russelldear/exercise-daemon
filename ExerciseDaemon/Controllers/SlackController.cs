@@ -28,7 +28,7 @@ namespace ExerciseDaemon.Controllers
 
         public IActionResult Connect()
         {
-            return Redirect(string.Format(AuthorizeUrlFormat, _slackSettings.ClientId, _slackSettings.RedirectUri));
+            return Redirect(string.Format(AuthorizeUrlFormat, _slackSettings.SlackClientId, _slackSettings.SlackRedirectUri));
         }
 
         public async Task<IActionResult> Connected([FromQuery] string code)
@@ -52,7 +52,7 @@ namespace ExerciseDaemon.Controllers
 
         private async Task<TokenResponse> GetToken(string code)
         {
-            var url = string.Format(TokenUrlFormat, _slackSettings.ClientId, _slackSettings.ClientSecret, code, _slackSettings.RedirectUri);
+            var url = string.Format(TokenUrlFormat, _slackSettings.SlackClientId, _slackSettings.SlackClientSecret, code, _slackSettings.SlackRedirectUri);
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 

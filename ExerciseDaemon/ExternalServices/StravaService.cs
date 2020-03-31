@@ -97,7 +97,7 @@ namespace ExerciseDaemon.ExternalServices
 
             var stravaAthlete = await GetStravaAthlete(tokenSet, athleteIdentifier);
 
-            await PostWelcomeMessage(stravaAthlete, latestActivity);
+            await PostWelcomeMessage(slackUserId, latestActivity);
 
             return athlete;
         }
@@ -167,9 +167,9 @@ namespace ExerciseDaemon.ExternalServices
             return result;
         }
 
-        private async Task PostWelcomeMessage(StravaAthlete stravaAthlete, Activity latestActivity)
+        private async Task PostWelcomeMessage(string slackUserid, Activity latestActivity)
         {
-            var welcomeString = $"Welcome, {stravaAthlete.FirstName} {stravaAthlete.LastName}! ";
+            var welcomeString = $"Welcome, <@{slackUserid}>! ";
 
             if (latestActivity != null)
             {

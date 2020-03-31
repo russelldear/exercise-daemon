@@ -66,9 +66,9 @@ namespace ExerciseDaemon
                 slackSettings = new SlackSettings
                 {
                     BaseUrl = Environment.GetEnvironmentVariable("SlackUrl"),
-                    ClientId = Environment.GetEnvironmentVariable("SlackClientId"),
-                    ClientSecret = Environment.GetEnvironmentVariable("SlackClientSecret"),
-                    RedirectUri = Environment.GetEnvironmentVariable("SlackRedirectUri")
+                    SlackClientId = Environment.GetEnvironmentVariable("SlackClientId"),
+                    SlackClientSecret = Environment.GetEnvironmentVariable("SlackClientSecret"),
+                    SlackRedirectUri = Environment.GetEnvironmentVariable("SlackRedirectUri")
                 };
             }
 

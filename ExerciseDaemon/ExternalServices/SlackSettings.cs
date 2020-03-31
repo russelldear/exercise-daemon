@@ -4,10 +4,10 @@
     {
         public string BaseUrl { get; set; }
 
-        public string ClientId { get; set; }
+        public string SlackClientId { get; set; }
 
-        public string ClientSecret { get; set; }
+        public string SlackClientSecret { get; set; }
 
-        public string RedirectUri { get; set; }
+        public string SlackRedirectUri { get; set; }
     }
 }
