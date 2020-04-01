@@ -13,10 +13,12 @@ namespace ExerciseDaemon.Controllers
     public class HomeController : Controller
     {
         private readonly StravaService _stravaService;
+        private readonly SlackSettings _slackSettings;
 
-        public HomeController(StravaService stravaService)
+        public HomeController(StravaService stravaService, SlackSettings slackSettings)
         {
             _stravaService = stravaService;
+            _slackSettings = slackSettings;
         }
 
         public async Task<IActionResult> Index()
@@ -43,11 +45,13 @@ namespace ExerciseDaemon.Controllers
 
                     var athleteName = $"{claimsIdentity.FindFirst(FirstName).Value} {claimsIdentity.FindFirst(LastName).Value}";
 
-                    var athlete = await _stravaService.GetOrCreateAthlete(tokenSet, slackUserId, athleteIdentifier, athleteName);
+                    var athleteViewModel = await _stravaService.GetOrCreateAthlete(tokenSet, slackUserId, athleteIdentifier, athleteName);
 
-                    athlete.StravaJoinDate = DateTime.Parse(claimsIdentity.FindFirst(StravaJoinDate).Value);
+                    athleteViewModel.StravaJoinDate = DateTime.Parse(claimsIdentity.FindFirst(StravaJoinDate).Value);
 
-                    return View(athlete);
+                    athleteViewModel.SlackChannelUrl = $"{_slackSettings.SlackWorkspaceUrl}{_slackSettings.SlackChannelId}";
+
+                    return View(athleteViewModel);
                 }
             }
 

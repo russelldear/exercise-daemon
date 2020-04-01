@@ -1,20 +1,8 @@
 ﻿@model ExerciseDaemon.Models.ConfigViewModel
 
-<p>
-    @Model.StravaClientId
-</p>
-
-
-<p>
-    @Model.DynamoDbRegion
-</p>
-
-
-<p>
-    @Model.DynamoDbUrl
-</p>
-
-
-<p>
-    @Model.SlackUrl
-</p>
+@foreach (string property in Model.ConfigValues)
+{
+    <p>
+        @property
+    </p>
+}

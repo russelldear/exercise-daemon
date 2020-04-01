@@ -29,13 +29,13 @@ namespace ExerciseDaemon.ExternalServices
             await client.PostAsync(_slackSettings.SlackWebhookUrl, body);
         }
 
-        public async Task AddUserToChannel(string slackUserId)
+        public async Task<HttpResponseMessage> AddUserToChannel(string slackUserId)
         {
             var url = string.Format(AddChannelFormat, _slackSettings.SlackBotUserAccessToken, _slackSettings.SlackChannelId, slackUserId);
 
             var request = new HttpRequestMessage(HttpMethod.Post, url);
 
-            var response = await _client.SendAsync(request);
+            return await _client.SendAsync(request);
         }
     }
 }

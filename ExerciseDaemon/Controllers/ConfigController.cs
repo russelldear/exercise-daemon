@@ -1,59 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ExerciseDaemon.ExternalServices;
 using ExerciseDaemon.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ExerciseDaemon.Controllers
 {
     public class ConfigController : Controller
     {
         private readonly ISubstitutionBinder _substitutionBinder;
+        private readonly SlackService _slackService;
 
-        public ConfigController(ISubstitutionBinder substitutionBinder)
+        public ConfigController(ISubstitutionBinder substitutionBinder, SlackService slackService)
         {
             _substitutionBinder = substitutionBinder;
+            _slackService = slackService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index([FromQuery] string substitutionBindingMethod, [FromQuery] string slackId)
         {
-            var config = new ConfigViewModel();
-
-            try
+            var config = new ConfigViewModel
             {
-                var stravaSettings = _substitutionBinder.BuildStravaSettings();
+                ConfigValues = new List<string>()
+            };
 
-                config.StravaClientId = stravaSettings.ClientId.ToString();
-            }
-            catch (Exception e)
+            if (!string.IsNullOrWhiteSpace(slackId))
             {
-                config.StravaClientId = e.Message + e.StackTrace;
-            }
+                var response = await _slackService.AddUserToChannel(slackId);
 
-            try
-            {
-                var dynamoDbSettings = _substitutionBinder.BuildDynamoDbSettings();
-
-                config.DynamoDbRegion = dynamoDbSettings.RegionEndpoint;
-                config.DynamoDbUrl = dynamoDbSettings.ServiceUrl;
-            }
-            catch (Exception e)
-            {
-                config.DynamoDbRegion = e.Message + e.StackTrace;
+                config.ConfigValues.Add($"Response Content: {await response.Content.ReadAsStringAsync()}");
             }
 
-            try
+            if (!string.IsNullOrWhiteSpace(substitutionBindingMethod))
             {
-                var slackSettings = _substitutionBinder.BuildSlackSettings();
+                var substitutionBinder = Type.GetType("ExerciseDaemon.SubstitutionBinder");
+                var method = substitutionBinder.GetMethod(substitutionBindingMethod);
+                var result = method.Invoke(_substitutionBinder, new object[0]);
 
-                config.SlackUrl = slackSettings.SlackWebhookUrl;
+                config.ConfigValues.Add(JsonConvert.SerializeObject(result));
             }
-            catch (Exception e)
-            {
-                config.SlackUrl = e.Message + e.StackTrace;
-            }
-            
+
             return View(config);
         }
     }

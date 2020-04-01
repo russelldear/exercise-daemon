@@ -9,5 +9,7 @@ namespace ExerciseDaemon.Models
         public DateTime StravaJoinDate { get; set; }
 
         public List<Activity> Activities { get; set; }
+
+        public string SlackChannelUrl { get; set; }
     }
 }
