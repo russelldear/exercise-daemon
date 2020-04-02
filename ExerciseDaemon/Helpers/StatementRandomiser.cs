@@ -43,7 +43,12 @@ namespace ExerciseDaemon.Helpers
             "Yusss! Spotted you smashing out that {1}, {0}. Sweetbix!",
             "One more {1} for the record books, {0}. Nice one!",
             "A wild {1} appears. {0} uses Strava attack. It's super effective!",
-            "Oof, don't think I could have nailed that {1} as well as you did, {0}. Bloody awesome."
+            "Oof, don't think I could have nailed that {1} as well as you did, {0}. Bloody awesome.",
+            "+100 health points for that {1} just now, {0}.",
+            "Super {1} action there, {0}. ",
+            "Don't you just love it when a {1} plan comes together, {0}? Fine effort.",
+            "Fantastic work {0} - that {1} just now is just the ticket.",
+            "{0}, my friend, you are setting all the right examples with {1}s like that. Keep it up!"
         };
 
         private readonly List<string> _weekReminder = new List<string>
