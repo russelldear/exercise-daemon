@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using ExerciseDaemon.ExternalServices;
+using ExerciseDaemon.Models;
 using ExerciseDaemon.Models.Slack;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -45,8 +46,9 @@ namespace ExerciseDaemon.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                var error = $"I'm sorry you had to see this. Could you send it to Russ please? {Environment.NewLine} {e.Message} - {e.StackTrace}";
+
+                return View(new SlackViewModel { Error = error });
             }
         }
 

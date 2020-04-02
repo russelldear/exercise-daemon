@@ -11,5 +11,7 @@ namespace ExerciseDaemon.Models
         public List<Activity> Activities { get; set; }
 
         public string SlackChannelUrl { get; set; }
+
+        public string Error { get; set; }
     }
 }

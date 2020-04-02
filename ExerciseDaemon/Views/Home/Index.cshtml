@@ -4,58 +4,67 @@
     ViewData["Title"] = "Exercise Daemon";
 }
 
-@if (!User.Identity.IsAuthenticated)
+@if (@Model != null && !string.IsNullOrWhiteSpace(@Model.Error))
 {
-    <p class="lead">Exercise your lockdown demons.</p> <!--Connect your Strava account to get motivated to exercise during lockdown!-->
-    <div class="row">
-        <div class="col-lg-12">
-            <p>
-                The benefits of regular exercise to physical and mental health are well known, and the coronavirus lockdown is
-                <a href="https://www.pcmag.com/news/fitbit-sees-global-step-counts-drop-as-coronavirus-forces-people-to-stay">
-                    reducing the daily step count of New Zealand (and the rest of the world)</a>.
-                Connect your Strava account to get motivated via a dedicated Xero Slack channel.
-            </p>
-            <p>
-                <a class="strava-connect" asp-controller="Strava" asp-action="Connect">
-                    <img src="/images/btn_strava_connectwith_orange.png" />
-                </a>
-            </p>
+    <p>@Model.Error</p>
+}
+else
+{
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <p class="lead">Exercise your lockdown demons.</p>
+        <!--Connect your Strava account to get motivated to exercise during lockdown!-->
+        <div class="row">
+            <div class="col-lg-12">
+                <p>
+                    The benefits of regular exercise to physical and mental health are well known, and the coronavirus lockdown is
+                    <a href="https://www.pcmag.com/news/fitbit-sees-global-step-counts-drop-as-coronavirus-forces-people-to-stay">
+                        reducing the daily step count of New Zealand (and the rest of the world)
+                    </a>.
+                    Connect your Strava account to get motivated via a dedicated Xero Slack channel.
+                </p>
+                <p>
+                    <a class="strava-connect" asp-controller="Strava" asp-action="Connect">
+                        <img src="/images/btn_strava_connectwith_orange.png" />
+                    </a>
+                </p>
+            </div>
         </div>
-    </div>
     }
     else
     {
-    <p class="lead">You're connected! Woo!</p>
-    <p>Now you just need to <b><a target="_blank" href="@Model.SlackChannelUrl">click here</a></b> to get to the Xero slack channel that will keep you motivated to stay fit during lockdown.</p>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">Athlete</div>
-                <div class="panel-body">
-                    <p><strong>@Model.Name</strong> &ndash; Joined Strava on @Model.StravaJoinDate.ToString("D")</p>
+        <p class="lead">You're connected! Woo!</p>
+        <p>Now you just need to <b><a target="_blank" href="@Model.SlackChannelUrl">click here</a></b> to get to the Xero slack channel that will keep you motivated to stay fit during lockdown.</p>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Athlete</div>
+                    <div class="panel-body">
+                        <p><strong>@Model.Name</strong> &ndash; Joined Strava on @Model.StravaJoinDate.ToString("D")</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">Latest Activities</div>
-                <div class="panel-body">
-                    @if (Model.Activities.Any())
-                    {
-                        @foreach (var activity in Model.Activities)
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Latest Activities</div>
+                    <div class="panel-body">
+                        @if (Model.Activities.Any())
                         {
-                            <p><strong>@activity.Type</strong> &ndash; @activity.StartDateLocal.ToString("F")</p>
+                            @foreach (var activity in Model.Activities)
+                            {
+                                <p><strong>@activity.Type</strong> &ndash; @activity.StartDateLocal.ToString("F")</p>
+                            }
                         }
-                    }
-                    else
-                    {
-                        <p>None. Get exercising!</p>
-                    }
+                        else
+                        {
+                            <p>None. Get exercising!</p>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     }
+}

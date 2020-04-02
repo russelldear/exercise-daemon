@@ -1,0 +1,10 @@
+﻿@model ExerciseDaemon.Models.StravaViewModel
+
+@{
+    ViewData["Title"] = "Exercise Daemon";
+}
+
+@if (@Model != null && !string.IsNullOrWhiteSpace(@Model.Error))
+{
+    <p>@Model.Error</p>
+}

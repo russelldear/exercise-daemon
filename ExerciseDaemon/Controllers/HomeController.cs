@@ -23,36 +23,45 @@ namespace ExerciseDaemon.Controllers
 
         public async Task<IActionResult> Index()
         {
-            if (User.Identity.IsAuthenticated)
+            try
             {
-                var slackUserId = Request.Cookies["SlackUserId"];
-
-                if (string.IsNullOrWhiteSpace(slackUserId))
+                if (User.Identity.IsAuthenticated)
                 {
-                    return RedirectToAction("Connect", "Slack");
+                    var slackUserId = Request.Cookies["SlackUserId"];
+
+                    if (string.IsNullOrWhiteSpace(slackUserId))
+                    {
+                        return RedirectToAction("Connect", "Slack");
+                    }
+
+                    var tokenSet = new StravaTokenSet
+                    {
+                        AccessToken = await HttpContext.GetTokenAsync("access_token"),
+                        RefreshToken = await HttpContext.GetTokenAsync("refresh_token"),
+                        ExpiresAt = DateTime.Parse(await HttpContext.GetTokenAsync("expires_at"))
+                    };
+
+                    if (!string.IsNullOrWhiteSpace(tokenSet.AccessToken) && User.Identity is ClaimsIdentity claimsIdentity)
+                    {
+                        var athleteIdentifier = int.Parse(claimsIdentity.FindFirst(AthleteIdentifier).Value);
+
+                        var athleteName = $"{claimsIdentity.FindFirst(FirstName).Value} {claimsIdentity.FindFirst(LastName).Value}";
+
+                        var athleteViewModel = await _stravaService.GetOrCreateAthlete(tokenSet, slackUserId, athleteIdentifier, athleteName);
+
+                        athleteViewModel.StravaJoinDate = DateTime.Parse(claimsIdentity.FindFirst(StravaJoinDate).Value);
+
+                        athleteViewModel.SlackChannelUrl = $"{_slackSettings.SlackWorkspaceUrl}{_slackSettings.SlackChannelId}";
+
+                        return View(athleteViewModel);
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                var error = $"I'm sorry you had to see this. Could you send it to Russ please? {Environment.NewLine} {e.Message} - {e.StackTrace}";
 
-                var tokenSet = new StravaTokenSet
-                {
-                    AccessToken = await HttpContext.GetTokenAsync("access_token"),
-                    RefreshToken = await HttpContext.GetTokenAsync("refresh_token"),
-                    ExpiresAt = DateTime.Parse(await HttpContext.GetTokenAsync("expires_at"))
-                };
-
-                if (!string.IsNullOrWhiteSpace(tokenSet.AccessToken) && User.Identity is ClaimsIdentity claimsIdentity)
-                {
-                    var athleteIdentifier = int.Parse(claimsIdentity.FindFirst(AthleteIdentifier).Value);
-
-                    var athleteName = $"{claimsIdentity.FindFirst(FirstName).Value} {claimsIdentity.FindFirst(LastName).Value}";
-
-                    var athleteViewModel = await _stravaService.GetOrCreateAthlete(tokenSet, slackUserId, athleteIdentifier, athleteName);
-
-                    athleteViewModel.StravaJoinDate = DateTime.Parse(claimsIdentity.FindFirst(StravaJoinDate).Value);
-
-                    athleteViewModel.SlackChannelUrl = $"{_slackSettings.SlackWorkspaceUrl}{_slackSettings.SlackChannelId}";
-
-                    return View(athleteViewModel);
-                }
+                return View(new AthleteViewModel{Error = error});
             }
 
             return View();

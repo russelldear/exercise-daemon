@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ExerciseDaemon.ExternalServices;
+using ExerciseDaemon.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,14 +23,24 @@ namespace ExerciseDaemon.Controllers
 
         public IActionResult Connected()
         {
-            var slackUserId = Request.Cookies["SlackUserId"];
-
-            if (string.IsNullOrWhiteSpace(slackUserId))
+            try
             {
-                return RedirectToAction("Connect", "Slack");
-            }
+                var slackUserId = Request.Cookies["SlackUserId"];
 
-            return RedirectToAction("Index", "Home");
+                if (string.IsNullOrWhiteSpace(slackUserId))
+                {
+                    return RedirectToAction("Connect", "Slack");
+                }
+
+                return RedirectToAction("Index", "Home");
+
+            }
+            catch (Exception e)
+            {
+                var error = $"I'm sorry you had to see this. Could you send it to Russ please? {Environment.NewLine} {e.Message} - {e.StackTrace}";
+
+                return View(new StravaViewModel {Error = error});
+            }
         }
 
         public async Task<IActionResult> SignOut()
