@@ -28,8 +28,5 @@ namespace ExerciseDaemon.Models.Strava
 
         [JsonProperty("utc_offset")]
         public double UtcOffset { get; set; }
-
-        [JsonProperty("suffer_score")]
-        public int SufferScore { get; set; }
     }
 }
