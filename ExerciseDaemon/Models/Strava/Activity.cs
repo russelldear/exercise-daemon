@@ -7,16 +7,17 @@ namespace ExerciseDaemon.Models.Strava
     {
         public long Id { get; set; }
 
-        public Athlete Athlete { get; set; }
-
         public string Name { get; set; }
-        
+
         public string Type { get; set; }
 
         [JsonProperty("private")]
         public bool IsPrivate { get; set; }
 
-        public float Distance { get; set; }
+        public float? Distance { get; set; }
+
+        [JsonProperty("total_elevation_gain")]
+        public float? Elevation { get; set; }
 
         [JsonProperty("start_date")]
         public DateTime StartDate { get; set; }
@@ -28,5 +29,7 @@ namespace ExerciseDaemon.Models.Strava
 
         [JsonProperty("utc_offset")]
         public double UtcOffset { get; set; }
+
+        public Map Map { get; set; }
     }
 }

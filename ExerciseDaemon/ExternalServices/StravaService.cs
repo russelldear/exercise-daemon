@@ -96,8 +96,6 @@ namespace ExerciseDaemon.ExternalServices
 
             await _athleteRepository.CreateOrUpdateAthlete(athlete);
 
-            var stravaAthlete = await GetStravaAthlete(tokenSet, athleteIdentifier);
-
             await PostWelcomeMessage(slackUserId, latestActivity);
 
             return athlete;
@@ -139,13 +137,6 @@ namespace ExerciseDaemon.ExternalServices
             var result = await SendStravaRequest<List<Activity>>(request, tokenSet, athleteIdentifier);
 
             return result.OrderByDescending(a => a.StartDateLocal).ToList();
-        }
-
-        private async Task<StravaAthlete> GetStravaAthlete(StravaTokenSet tokenSet, int athleteIdentifier)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"https://www.strava.com/api/v3/athlete");
-
-            return await SendStravaRequest<StravaAthlete>(request, tokenSet, athleteIdentifier);
         }
 
         private async Task<T> SendStravaRequest<T>(HttpRequestMessage request, StravaTokenSet tokenSet, int athleteIdentifier)

@@ -20,14 +20,16 @@ namespace ExerciseDaemon.BackgroundWorker
         private readonly AthleteRepository _athleteRepository;
         private readonly SlackService _slackService;
         private readonly StatementRandomiser _sr;
+        private readonly GoogleMapsService _googleMaps;
         private Timer _timer;
 
-        public TimedBackgroundWorker(StravaService stravaService, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr)
+        public TimedBackgroundWorker(StravaService stravaService, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr, GoogleMapsService googleMaps)
         {
             _stravaService = stravaService;
             _athleteRepository = athleteRepository;
             _slackService = slackService;
             _sr = sr;
+            _googleMaps = googleMaps;
         }
 
         private DateTime AWeekEarlier => DateTime.UtcNow.AddDays(-7);
@@ -85,7 +87,16 @@ namespace ExerciseDaemon.BackgroundWorker
 
                 _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
 
-                _slackService.PostSlackMessage(string.Format(_sr.Get(RecordNewActivity), GetSlackName(athlete), latestActivity.Type)).Wait();
+                var message = string.Format(_sr.Get(RecordNewActivity), GetSlackName(athlete), latestActivity.Type);
+
+                string imageUrl = null;
+
+                if (latestActivity.Map != null && !string.IsNullOrWhiteSpace(latestActivity.Map.SummaryPolyline))
+                {
+                    imageUrl = _googleMaps.BuildMap(latestActivity.Id, latestActivity.Map.SummaryPolyline).Result;
+                }
+
+                _slackService.PostSlackMessage(message, imageUrl).Wait();
             }
         }
 

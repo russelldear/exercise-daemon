@@ -34,10 +34,14 @@ namespace ExerciseDaemon
             var slackSettings = _substitutionBinder.BuildSlackSettings();
             services.TryAddSingleton(slackSettings);
 
+            var googleSettings = _substitutionBinder.BuildGoogleSettings();
+            services.TryAddSingleton(googleSettings);
+
             services.TryAddSingleton<AthleteRepository>();
             services.TryAddSingleton<StravaService>();
             services.TryAddSingleton<SlackService>();
             services.TryAddSingleton<StatementRandomiser>();
+            services.TryAddSingleton<GoogleMapsService>();
 
             services.AddAuthentication(options =>
             {

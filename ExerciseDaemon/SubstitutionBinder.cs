@@ -13,6 +13,8 @@ namespace ExerciseDaemon
         DynamoDbSettings BuildDynamoDbSettings();
 
         SlackSettings BuildSlackSettings();
+
+        GoogleSettings BuildGoogleSettings();
     }
 
     public class SubstitutionBinder : ISubstitutionBinder
@@ -76,6 +78,27 @@ namespace ExerciseDaemon
             }
 
             return slackSettings;
+        }
+
+        public GoogleSettings BuildGoogleSettings()
+        {
+            var googleSettings = new GoogleSettings();
+
+            try
+            {
+                googleSettings = _configuration.GetSection("Google").Get<GoogleSettings>();
+            }
+            catch { }
+
+            if (string.IsNullOrWhiteSpace(googleSettings.ApiKey))
+            {
+                googleSettings = new GoogleSettings
+                {
+                    ApiKey = Environment.GetEnvironmentVariable("GoogleApiKey")
+                };
+            }
+
+            return googleSettings;
         }
     }
 }

@@ -1,6 +1,11 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using ExerciseDaemon.Models.Slack;
+using Newtonsoft.Json;
 
 namespace ExerciseDaemon.ExternalServices
 {
@@ -18,15 +23,32 @@ namespace ExerciseDaemon.ExternalServices
             _client = new HttpClient();
         }
 
-        public async Task PostSlackMessage(string message)
+        public async Task PostSlackMessage(string message, string imageUrl = null, List<Tuple<string, string, bool>> fields = null)
         {
-            var client = new HttpClient();
+            var slackMessage = new SlackMessage { Text = message };
 
-            var bodyString = $"{{\"text\": \"{message}\"}}";
+            if (imageUrl != null || fields != null)
+            {
+                slackMessage.Attachments = new[] {new Attachment {ImageUrl = imageUrl}};
+
+                if (fields != null)
+                {
+                    var fieldList = new List<Field>();
+
+                    foreach (var field in fields)
+                    {
+                        fieldList.Add(new Field { Title = field.Item1, Value = field.Item2, IsShort = field.Item3 });
+                    }
+
+                    slackMessage.Attachments.First().Fields = fieldList.ToArray();
+                }
+            }
+
+            var bodyString = JsonConvert.SerializeObject(slackMessage);
 
             var body = new StringContent(bodyString, Encoding.UTF8, "application/json");
 
-            await client.PostAsync(_slackSettings.SlackWebhookUrl, body);
+            await _client.PostAsync(_slackSettings.SlackWebhookUrl, body);
         }
 
         public async Task<HttpResponseMessage> AddUserToChannel(string slackUserId)
@@ -38,4 +60,5 @@ namespace ExerciseDaemon.ExternalServices
             return await _client.SendAsync(request);
         }
     }
+
 }
