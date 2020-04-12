@@ -4,6 +4,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Serilog;
 
 namespace ExerciseDaemon
 {
@@ -23,6 +24,9 @@ namespace ExerciseDaemon
                     collection.AddHostedService<TimedBackgroundWorker>();
                 })
                 .UseKestrel(options => { options.Listen(IPAddress.Any, 5236); })
+                .UseSerilog((hostingContext, loggerConfiguration) =>
+                    loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration)
+                )
                 .UseUrls("http://*:5236")
                 .UseStartup<Startup>()
                 .Build();

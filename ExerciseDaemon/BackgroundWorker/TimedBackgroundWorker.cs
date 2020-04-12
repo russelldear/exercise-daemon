@@ -8,6 +8,7 @@ using ExerciseDaemon.Helpers;
 using ExerciseDaemon.Models.Strava;
 using ExerciseDaemon.Repositories;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using static ExerciseDaemon.Constants.StatementSetKeys;
 
 namespace ExerciseDaemon.BackgroundWorker
@@ -21,15 +22,17 @@ namespace ExerciseDaemon.BackgroundWorker
         private readonly SlackService _slackService;
         private readonly StatementRandomiser _sr;
         private readonly GoogleMapsService _googleMaps;
+        private readonly ILogger<TimedBackgroundWorker> _logger;
         private Timer _timer;
 
-        public TimedBackgroundWorker(StravaService stravaService, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr, GoogleMapsService googleMaps)
+        public TimedBackgroundWorker(StravaService stravaService, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr, GoogleMapsService googleMaps, ILogger<TimedBackgroundWorker> logger)
         {
             _stravaService = stravaService;
             _athleteRepository = athleteRepository;
             _slackService = slackService;
             _sr = sr;
             _googleMaps = googleMaps;
+            _logger = logger;
         }
 
         private DateTime AWeekEarlier => DateTime.UtcNow.AddDays(-7);
@@ -45,31 +48,38 @@ namespace ExerciseDaemon.BackgroundWorker
 
         private void DoWork(object state)
         {
-            var athletes = _athleteRepository.GetAthletes().Result;
-
-            foreach (var athlete in athletes)
+            try
             {
-                var tokenSet = new StravaTokenSet(athlete.AccessToken, athlete.RefreshToken, athlete.ExpiresAt);
+                var athletes = _athleteRepository.GetAthletes().Result;
 
-                var activities = _stravaService.GetRecentActivities(tokenSet, athlete.Id).Result;
+                foreach (var athlete in athletes)
+                {
+                    var tokenSet = new StravaTokenSet(athlete.AccessToken, athlete.RefreshToken, athlete.ExpiresAt);
 
-                if (activities.Any())
-                {
-                    CheckForNewActivity(athlete, activities);
-                }
+                    var activities = _stravaService.GetRecentActivities(tokenSet, athlete.Id).Result;
 
-                if (athlete.ReminderCount == 0)
-                {
-                    CheckForWeeklyReminder(activities, athlete);
+                    if (activities.Any())
+                    {
+                        CheckForNewActivity(athlete, activities);
+                    }
+
+                    if (athlete.ReminderCount == 0)
+                    {
+                        CheckForWeeklyReminder(activities, athlete);
+                    }
+                    else if (athlete.ReminderCount == 1)
+                    {
+                        CheckForFortnightReminder(athlete);
+                    }
+                    else if (athlete.ReminderCount == 2)
+                    {
+                        CheckForMonthReminder(athlete);
+                    }
                 }
-                else if (athlete.ReminderCount == 1)
-                {
-                    CheckForFortnightReminder(athlete);
-                }
-                else if (athlete.ReminderCount == 2)
-                {
-                    CheckForMonthReminder(athlete);
-                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Timed background worker failed: '{e.Message}'");
             }
         }
 

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ExerciseDaemon.ExternalServices;
 using ExerciseDaemon.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace ExerciseDaemon.Controllers
@@ -12,11 +13,13 @@ namespace ExerciseDaemon.Controllers
     {
         private readonly ISubstitutionBinder _substitutionBinder;
         private readonly SlackService _slackService;
+        private readonly ILogger<ConfigController> _logger;
 
-        public ConfigController(ISubstitutionBinder substitutionBinder, SlackService slackService)
+        public ConfigController(ISubstitutionBinder substitutionBinder, SlackService slackService, ILogger<ConfigController> logger)
         {
             _substitutionBinder = substitutionBinder;
             _slackService = slackService;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index([FromQuery] string substitutionBindingMethod, [FromQuery] string slackId)
@@ -41,6 +44,8 @@ namespace ExerciseDaemon.Controllers
 
                 config.ConfigValues.Add(JsonConvert.SerializeObject(result));
             }
+
+            _logger.LogInformation("Config page visited.");
 
             return View(config);
         }
