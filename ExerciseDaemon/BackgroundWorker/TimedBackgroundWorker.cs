@@ -119,7 +119,7 @@ namespace ExerciseDaemon.BackgroundWorker
 
                 var message = _messageFactory.NewActivityMessage(athlete, latestActivity);
 
-                _slackService.PostSlackMessage(message).Wait();
+                //_slackService.PostSlackMessage(message).Wait();
                 
                 _logger.LogInformation($"Posted for {athlete.Name}.");
             }
