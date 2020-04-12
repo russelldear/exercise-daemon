@@ -48,7 +48,22 @@ namespace ExerciseDaemon.Helpers
             "Super {1} action there, {0}. ",
             "Don't you just love it when a {1} plan comes together, {0}? Fine effort.",
             "Fantastic work {0} - that {1} just now is just the ticket.",
-            "{0}, my friend, you are setting all the right examples with {1}s like that. Keep it up!"
+            "{0}, my friend, you are setting all the right examples with {1}s like that. Keep it up!",
+            "<nods in silent appreciation at {0}'s {1}>",
+            "...and coming in hot with a spiffy wee {1}, it's {0}! Woo!",
+            "YES! {0}! YES! {1}! YES YES YES!",
+            "Your {1} has just made my day, {0}. Muchas gracias.",
+            "{0}, if I wasn't just a bunch of electrical charges stored in capacitors somewhere in Virginia, I would pat you on the back for that {1}.",
+            "Snaps for the {1} star, {0}!",
+            "I'm not saying that was a _perfect_ {1}, {0}, but I haven't seen a better one - and I've been doing this a looong time, know what I mean?",
+            "Damn, {0}, back at it again with those slammin' {1}s.",
+            "I liked you before, {0}, but after that {1} just now - well, let's just say you're #1 in my book.",
+            "You're making this lockdown bizzo a lot easier with those {1}s, {0}. Bring 'em on.",
+            "{1} long and prosper, Captain {0} :spock-hand:",
+            "{0}. {1}. Winning.",
+            "Another {1}? The (free non-alcoholic) drinks are on me, {0}.",
+            "{0}'s {1} : legen.......wait for it...........dary.",
+            "Are you icecream, {0}? 'Cause that {1} was tip-top."
         };
 
         private readonly List<string> _weekReminder = new List<string>
