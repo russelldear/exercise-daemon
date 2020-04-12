@@ -15,23 +15,21 @@ namespace ExerciseDaemon.BackgroundWorker
 {
     public class TimedBackgroundWorker : IHostedService, IDisposable
     {
-        private const int FrequencySeconds = 300;
+        private const int FrequencySeconds = 30;
 
         private readonly StravaService _stravaService;
         private readonly AthleteRepository _athleteRepository;
         private readonly SlackService _slackService;
-        private readonly StatementRandomiser _sr;
-        private readonly GoogleMapsService _googleMaps;
+        private readonly MessageFactory _messageFactory;
         private readonly ILogger<TimedBackgroundWorker> _logger;
         private Timer _timer;
 
-        public TimedBackgroundWorker(StravaService stravaService, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr, GoogleMapsService googleMaps, ILogger<TimedBackgroundWorker> logger)
+        public TimedBackgroundWorker(StravaService stravaService, AthleteRepository athleteRepository, SlackService slackService, MessageFactory messageFactory, ILogger<TimedBackgroundWorker> logger)
         {
             _stravaService = stravaService;
             _athleteRepository = athleteRepository;
             _slackService = slackService;
-            _sr = sr;
-            _googleMaps = googleMaps;
+            _messageFactory = messageFactory;
             _logger = logger;
         }
 
@@ -97,16 +95,9 @@ namespace ExerciseDaemon.BackgroundWorker
 
                 _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
 
-                var message = string.Format(_sr.Get(RecordNewActivity), GetSlackName(athlete), latestActivity.Type);
+                var message = _messageFactory.NewActivityMessage(athlete, latestActivity);
 
-                string imageUrl = null;
-
-                if (latestActivity.Map != null && !string.IsNullOrWhiteSpace(latestActivity.Map.SummaryPolyline))
-                {
-                    imageUrl = _googleMaps.BuildMap(latestActivity.Id, latestActivity.Map.SummaryPolyline).Result;
-                }
-
-                _slackService.PostSlackMessage(message, imageUrl).Wait();
+                _slackService.PostSlackMessage(message).Wait();
             }
         }
 
@@ -118,7 +109,7 @@ namespace ExerciseDaemon.BackgroundWorker
             {
                 UpdateReminders(athlete, 1);
 
-                _slackService.PostSlackMessage(string.Format(_sr.Get(WeekReminder), GetSlackName(athlete))).Wait();
+                _slackService.PostSlackMessage(_messageFactory.ReminderMessage(WeekReminder, athlete)).Wait();
             }
         }
 
@@ -128,7 +119,7 @@ namespace ExerciseDaemon.BackgroundWorker
             {
                 UpdateReminders(athlete, 2);
 
-                _slackService.PostSlackMessage(string.Format(_sr.Get(FortnightReminder), GetSlackName(athlete))).Wait();
+                _slackService.PostSlackMessage(_messageFactory.ReminderMessage(FortnightReminder, athlete)).Wait();
             }
         }
 
@@ -138,7 +129,7 @@ namespace ExerciseDaemon.BackgroundWorker
             {
                 UpdateReminders(athlete, 3);
 
-                _slackService.PostSlackMessage(string.Format(_sr.Get(MonthReminder), GetSlackName(athlete))).Wait();
+                _slackService.PostSlackMessage(_messageFactory.ReminderMessage(MonthReminder, athlete)).Wait();
             }
         }
 
@@ -148,11 +139,6 @@ namespace ExerciseDaemon.BackgroundWorker
             athlete.LastReminderDateTimeUtc = DateTime.UtcNow;
 
             _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
-        }
-
-        private string GetSlackName(Athlete athlete)
-        {
-            return $"<@{athlete.SlackUserId}>";
         }
 
         public Task StopAsync(CancellationToken stoppingToken)

@@ -42,6 +42,7 @@ namespace ExerciseDaemon
             services.TryAddSingleton<SlackService>();
             services.TryAddSingleton<StatementRandomiser>();
             services.TryAddSingleton<GoogleMapsService>();
+            services.TryAddSingleton<MessageFactory>();
 
             services.AddAuthentication(options =>
             {

@@ -23,27 +23,8 @@ namespace ExerciseDaemon.ExternalServices
             _client = new HttpClient();
         }
 
-        public async Task PostSlackMessage(string message, string imageUrl = null, List<Tuple<string, string, bool>> fields = null)
+        public async Task PostSlackMessage(SlackMessage slackMessage)
         {
-            var slackMessage = new SlackMessage { Text = message };
-
-            if (imageUrl != null || fields != null)
-            {
-                slackMessage.Attachments = new[] {new Attachment {ImageUrl = imageUrl}};
-
-                if (fields != null)
-                {
-                    var fieldList = new List<Field>();
-
-                    foreach (var field in fields)
-                    {
-                        fieldList.Add(new Field { Title = field.Item1, Value = field.Item2, IsShort = field.Item3 });
-                    }
-
-                    slackMessage.Attachments.First().Fields = fieldList.ToArray();
-                }
-            }
-
             var bodyString = JsonConvert.SerializeObject(slackMessage);
 
             var body = new StringContent(bodyString, Encoding.UTF8, "application/json");

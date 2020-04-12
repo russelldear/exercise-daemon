@@ -8,9 +8,7 @@ using ExerciseDaemon.Helpers;
 using ExerciseDaemon.Models;
 using ExerciseDaemon.Models.Strava;
 using ExerciseDaemon.Repositories;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using static ExerciseDaemon.Constants.StatementSetKeys;
 
 namespace ExerciseDaemon.ExternalServices
 {
@@ -22,14 +20,16 @@ namespace ExerciseDaemon.ExternalServices
         private readonly AthleteRepository _athleteRepository;
         private readonly SlackService _slackService;
         private readonly StatementRandomiser _sr;
+        private readonly MessageFactory _messageFactory;
         private readonly HttpClient _client;
 
-        public StravaService(StravaSettings stravaSettings, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr)
+        public StravaService(StravaSettings stravaSettings, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr, MessageFactory messageFactory)
         {
             _stravaSettings = stravaSettings;
             _athleteRepository = athleteRepository;
             _slackService = slackService;
             _sr = sr;
+            _messageFactory = messageFactory;
 
             _client = new HttpClient();
         }
@@ -163,27 +163,9 @@ namespace ExerciseDaemon.ExternalServices
         {
             await _slackService.AddUserToChannel(slackUserid);
 
-            var welcomeString = $"Welcome, <@{slackUserid}>! ";
+            var message = _messageFactory.WelcomeMessage(slackUserid, latestActivity);
 
-            if (latestActivity != null)
-            {
-                var nowLocal = DateTime.UtcNow.AddSeconds(latestActivity.UtcOffset);
-
-                if (latestActivity.StartDateLocal >= nowLocal.Date)
-                {
-                    welcomeString += string.Format(_sr.Get(WelcomeTodayPrompts), latestActivity.Type.ToLower());
-                }
-                else
-                {
-                    welcomeString += string.Format(_sr.Get(WelcomeRecentPrompts), latestActivity.Type.ToLower(), latestActivity.StartDateLocal.DayOfWeek);
-                }
-            }
-            else
-            {
-                welcomeString += _sr.Get(WelcomeNeverPrompts);
-            }
-
-            await _slackService.PostSlackMessage(welcomeString);
+            await _slackService.PostSlackMessage(message);
         }
     }
 }
