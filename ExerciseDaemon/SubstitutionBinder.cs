@@ -113,6 +113,15 @@ namespace ExerciseDaemon
             }
             catch { }
 
+            if (string.IsNullOrWhiteSpace(s3Settings.AccessKey))
+            {
+                s3Settings = new S3Settings
+                {
+                    AccessKey = Environment.GetEnvironmentVariable("S3AccessKey"),
+                    SecretKey = Environment.GetEnvironmentVariable("S3SecretKey")
+                };
+            }
+
             return s3Settings;
         }
     }
