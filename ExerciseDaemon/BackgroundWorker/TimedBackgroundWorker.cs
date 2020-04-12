@@ -53,6 +53,8 @@ namespace ExerciseDaemon.BackgroundWorker
             {
                 var athletes = _athleteRepository.GetAthletes().Result;
 
+                _logger.LogInformation($"Athletes: {JsonConvert.SerializeObject(athletes)}");
+
                 foreach (var athlete in athletes)
                 {
                     _logger.LogInformation($"Checking {athlete.Name} now.");
