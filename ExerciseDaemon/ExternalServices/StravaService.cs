@@ -167,7 +167,7 @@ namespace ExerciseDaemon.ExternalServices
 
                 result = JsonConvert.DeserializeObject<T>(responseString);
 
-                _logger.LogInformation($"Strava request deserialised.");
+                _logger.LogInformation($"Strava request deserialised: {responseString}");
             }
 
             return result;

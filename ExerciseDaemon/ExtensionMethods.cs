@@ -18,6 +18,7 @@ namespace ExerciseDaemon
 
             return $"{Math.Round(source.Value / 1000, 0, MidpointRounding.AwayFromZero)}m";
         }
+
         public static string ToFormattedElevation(this float? source)
         {
             if (!source.HasValue)
