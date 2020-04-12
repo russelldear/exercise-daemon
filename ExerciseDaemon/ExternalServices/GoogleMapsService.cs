@@ -13,6 +13,7 @@ namespace ExerciseDaemon.ExternalServices
 {
     public class GoogleMapsService
     {
+        private const string LocalFilename = "strava.png";
         private const string CloudFrontBaseUrl = "https://d3p3wfpsct07a1.cloudfront.net/";
 
         private readonly GoogleSettings _googleSettings;
@@ -28,26 +29,44 @@ namespace ExerciseDaemon.ExternalServices
 
         public async Task<string> BuildMap(long activityId, string summaryPolyline)
         {
+            _logger.LogInformation("1");
+
             var decodedSummaryPolyline = GooglePoints.Decode(summaryPolyline).ToList();
 
+            _logger.LogInformation("2");
+
             var path = string.Join("|", decodedSummaryPolyline.Select(p => $"{p.Latitude},{p.Longitude}"));
+
+            _logger.LogInformation("3");
+            _logger.LogInformation(path);
 
             var formatString = @"https://maps.googleapis.com/maps/api/staticmap?maptype=roadmap&size=800x800&path={0}&key={1}&size=800x800";
 
             var url = string.Format(formatString, path, _googleSettings.ApiKey);
 
+            _logger.LogInformation("4");
+            _logger.LogInformation(url);
+
             var response = await _client.GetAsync(url);
 
+            _logger.LogInformation("5");
+
             var result = await response.Content.ReadAsByteArrayAsync();
-            
-            var s3Filename = $"{activityId}.png";
+
+            _logger.LogInformation("6");
 
             using (var image = Image.Load(result))
             {
-                image.Save(s3Filename);
+                image.Save(LocalFilename);
             }
 
-            await UploadFileToS3(s3Filename, s3Filename);
+            _logger.LogInformation("7");
+
+            var s3Filename = $"{activityId}.png";
+
+            await UploadFileToS3(LocalFilename, s3Filename);
+
+            _logger.LogInformation("8");
 
             return $"{CloudFrontBaseUrl}{s3Filename}";
         }

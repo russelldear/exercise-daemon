@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ExerciseDaemon.ExternalServices;
 using ExerciseDaemon.Models.Slack;
 using ExerciseDaemon.Models.Strava;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static ExerciseDaemon.Constants.StatementSetKeys;
 
 namespace ExerciseDaemon.Helpers
@@ -22,7 +24,7 @@ namespace ExerciseDaemon.Helpers
             _logger = logger;
         }
 
-        public SlackMessage NewActivityMessage(Athlete athlete, Activity latestActivity)
+        public async Task<SlackMessage> NewActivityMessage(Athlete athlete, Activity latestActivity)
         {
             var message = string.Format(_sr.Get(RecordNewActivity), GetSlackName(athlete), latestActivity.Type);
 
@@ -30,7 +32,9 @@ namespace ExerciseDaemon.Helpers
 
             if (latestActivity.Map != null && !string.IsNullOrWhiteSpace(latestActivity.Map.SummaryPolyline))
             {
-                imageUrl = _googleMaps.BuildMap(latestActivity.Id, latestActivity.Map.SummaryPolyline).Result;
+                imageUrl = await _googleMaps.BuildMap(latestActivity.Id, latestActivity.Map.SummaryPolyline);
+                _logger.LogInformation("9");
+                _logger.LogInformation(imageUrl);
             }
 
             var attachment = new Attachment{ ImageUrl = imageUrl };
@@ -56,7 +60,14 @@ namespace ExerciseDaemon.Helpers
                 attachment.Fields = fields.ToArray();
             }
 
-            return new SlackMessage { Text = message, Attachments = new[] { attachment } };
+            _logger.LogInformation("10");
+
+            var slackMessage = new SlackMessage { Text = message, Attachments = new[] { attachment } };
+
+            _logger.LogInformation("11");
+            _logger.LogInformation(JsonConvert.SerializeObject(slackMessage));
+
+            return slackMessage;
         }
 
         public SlackMessage ReminderMessage(string reminderType, Athlete athlete)
