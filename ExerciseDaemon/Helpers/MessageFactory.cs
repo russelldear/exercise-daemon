@@ -5,7 +5,6 @@ using ExerciseDaemon.ExternalServices;
 using ExerciseDaemon.Models.Slack;
 using ExerciseDaemon.Models.Strava;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using static ExerciseDaemon.Constants.StatementSetKeys;
 
 namespace ExerciseDaemon.Helpers
@@ -32,8 +31,6 @@ namespace ExerciseDaemon.Helpers
             if (latestActivity.Map != null && !string.IsNullOrWhiteSpace(latestActivity.Map.SummaryPolyline))
             {
                 imageUrl = _googleMaps.BuildMap(latestActivity.Id, latestActivity.Map.SummaryPolyline).Result;
-                _logger.LogInformation("9");
-                _logger.LogInformation(imageUrl);
             }
 
             var attachment = new Attachment{ ImageUrl = imageUrl };
@@ -59,14 +56,7 @@ namespace ExerciseDaemon.Helpers
                 attachment.Fields = fields.ToArray();
             }
 
-            _logger.LogInformation("10");
-
-            var slackMessage = new SlackMessage { Text = message, Attachments = new[] { attachment } };
-
-            _logger.LogInformation("11");
-            _logger.LogInformation(JsonConvert.SerializeObject(slackMessage));
-
-            return slackMessage;
+            return new SlackMessage { Text = message, Attachments = new[] { attachment } };
         }
 
         public SlackMessage ReminderMessage(string reminderType, Athlete athlete)

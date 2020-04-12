@@ -25,8 +25,6 @@ namespace ExerciseDaemon.BackgroundWorker
         private readonly ILogger<TimedBackgroundWorker> _logger;
         private Timer _timer;
 
-        private Timer _otherTimer;
-
         public TimedBackgroundWorker(StravaService stravaService, AthleteRepository athleteRepository, SlackService slackService, MessageFactory messageFactory, ILogger<TimedBackgroundWorker> logger)
         {
             _stravaService = stravaService;
@@ -119,12 +117,7 @@ namespace ExerciseDaemon.BackgroundWorker
 
                 var message = _messageFactory.NewActivityMessage(athlete, latestActivity);
 
-                _logger.LogInformation("12");
-                _logger.LogInformation(JsonConvert.SerializeObject(message));
-
                 //_slackService.PostSlackMessage(message).Wait();
-
-                _logger.LogInformation($"Posted for {athlete.Name}.");
             }
             else
             {
@@ -175,8 +168,6 @@ namespace ExerciseDaemon.BackgroundWorker
         public Task StopAsync(CancellationToken stoppingToken)
         {
             _timer?.Change(Timeout.Infinite, 0);
-
-            _otherTimer?.Change(Timeout.Infinite, 0);
 
             return Task.CompletedTask;
         }
