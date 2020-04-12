@@ -35,6 +35,7 @@ namespace ExerciseDaemon.Helpers
                 imageUrl = await _googleMaps.BuildMap(latestActivity.Id, latestActivity.Map.SummaryPolyline);
                 _logger.LogInformation("9");
                 _logger.LogInformation(imageUrl);
+                await Task.Delay(5000);
             }
 
             var attachment = new Attachment{ ImageUrl = imageUrl };
@@ -66,6 +67,7 @@ namespace ExerciseDaemon.Helpers
 
             _logger.LogInformation("11");
             _logger.LogInformation(JsonConvert.SerializeObject(slackMessage));
+            await Task.Delay(5000);
 
             return slackMessage;
         }

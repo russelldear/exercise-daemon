@@ -15,6 +15,8 @@ namespace ExerciseDaemon
         SlackSettings BuildSlackSettings();
 
         GoogleSettings BuildGoogleSettings();
+
+        S3Settings BuildS3Settings();
     }
 
     public class SubstitutionBinder : ISubstitutionBinder
@@ -99,6 +101,19 @@ namespace ExerciseDaemon
             }
 
             return googleSettings;
+        }
+
+        public S3Settings BuildS3Settings()
+        {
+            var s3Settings = new S3Settings();
+
+            try
+            {
+                s3Settings = _configuration.GetSection("S3").Get<S3Settings>();
+            }
+            catch { }
+
+            return s3Settings;
         }
     }
 }

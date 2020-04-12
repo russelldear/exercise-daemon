@@ -37,6 +37,9 @@ namespace ExerciseDaemon
             var googleSettings = _substitutionBinder.BuildGoogleSettings();
             services.TryAddSingleton(googleSettings);
 
+            var s3Settings = _substitutionBinder.BuildS3Settings();
+            services.TryAddSingleton(s3Settings);
+
             services.TryAddSingleton<AthleteRepository>();
             services.TryAddSingleton<StravaService>();
             services.TryAddSingleton<SlackService>();

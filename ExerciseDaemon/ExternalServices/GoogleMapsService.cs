@@ -13,16 +13,17 @@ namespace ExerciseDaemon.ExternalServices
 {
     public class GoogleMapsService
     {
-        private const string LocalFilename = "strava.png";
         private const string CloudFrontBaseUrl = "https://d3p3wfpsct07a1.cloudfront.net/";
 
         private readonly GoogleSettings _googleSettings;
+        private readonly S3Settings _s3Settings;
         private readonly ILogger<GoogleMapsService> _logger;
         private readonly HttpClient _client;
 
-        public GoogleMapsService(GoogleSettings googleSettings, ILogger<GoogleMapsService> logger)
+        public GoogleMapsService(GoogleSettings googleSettings, S3Settings s3Settings, ILogger<GoogleMapsService> logger)
         {
             _googleSettings = googleSettings;
+            _s3Settings = s3Settings;
             _logger = logger;
             _client = new HttpClient();
         }
@@ -46,57 +47,78 @@ namespace ExerciseDaemon.ExternalServices
 
             _logger.LogInformation("4");
             _logger.LogInformation(url);
+            await Task.Delay(5000);
 
             var response = await _client.GetAsync(url);
 
             _logger.LogInformation("5");
+            _logger.LogInformation(response.StatusCode.ToString());
+            await Task.Delay(5000);
 
             var result = await response.Content.ReadAsByteArrayAsync();
 
             _logger.LogInformation("6");
-
-            using (var image = Image.Load(result))
-            {
-                image.Save(LocalFilename);
-            }
-
-            _logger.LogInformation("7");
+            await Task.Delay(5000);
 
             var s3Filename = $"{activityId}.png";
 
-            await UploadFileToS3(LocalFilename, s3Filename);
+            using (var image = Image.Load(result))
+            {
+                image.Save(s3Filename);
+            }
+
+            _logger.LogInformation("7");
+            await Task.Delay(5000);
+            
+            await UploadFileToS3(s3Filename);
 
             _logger.LogInformation("8");
+            await Task.Delay(5000);
 
             return $"{CloudFrontBaseUrl}{s3Filename}";
         }
 
-        public async Task UploadFileToS3(string localFilename, string s3Filename)
+        public async Task UploadFileToS3(string s3Filename)
         {
-            using (var client = new AmazonS3Client(RegionEndpoint.USEast1))
+            if (!string.IsNullOrWhiteSpace(_s3Settings.AccessKey) && !string.IsNullOrWhiteSpace(_s3Settings.SecretKey))
             {
-                using (var ms = new MemoryStream())
-                using (var file = new FileStream(localFilename, FileMode.Open, FileAccess.Read))
+                using (var client = new AmazonS3Client(_s3Settings.AccessKey, _s3Settings.SecretKey, RegionEndpoint.USEast1))
                 {
-                    var bytes = new byte[file.Length];
-
-                    file.Read(bytes, 0, (int)file.Length);
-
-                    ms.Write(bytes, 0, (int)file.Length);
-
-                    ms.Position = 0;
-
-                    var uploadRequest = new TransferUtilityUploadRequest
-                    {
-                        InputStream = ms,
-                        Key = s3Filename,
-                        BucketName = "exercise-daemon",
-                        CannedACL = S3CannedACL.PublicRead
-                    };
-
-                    var fileTransferUtility = new TransferUtility(client);
-                    await fileTransferUtility.UploadAsync(uploadRequest);
+                    await Upload(s3Filename, client);
                 }
+            }
+            else
+            {
+                using (var client = new AmazonS3Client("", "", RegionEndpoint.USEast1))
+                {
+                    await Upload(s3Filename, client);
+                }
+            }
+        }
+
+        private static async Task Upload(string s3Filename, IAmazonS3 client)
+        {
+            using (var ms = new MemoryStream())
+            using (var file = new FileStream(s3Filename, FileMode.Open, FileAccess.Read))
+            {
+                var bytes = new byte[file.Length];
+
+                file.Read(bytes, 0, (int) file.Length);
+
+                ms.Write(bytes, 0, (int) file.Length);
+
+                ms.Position = 0;
+
+                var uploadRequest = new TransferUtilityUploadRequest
+                {
+                    InputStream = ms,
+                    Key = s3Filename,
+                    BucketName = "exercise-daemon",
+                    CannedACL = S3CannedACL.PublicRead
+                };
+
+                var fileTransferUtility = new TransferUtility(client);
+                await fileTransferUtility.UploadAsync(uploadRequest);
             }
         }
     }

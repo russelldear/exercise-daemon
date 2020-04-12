@@ -105,20 +105,21 @@ namespace ExerciseDaemon.BackgroundWorker
 
             if (hasNoRecordedActivities || hasUnrecordedActivity)
             {
-                _logger.LogInformation($"Updating {athlete.Name} now.");
-                
                 var latestActivity = activities.First();
 
-                athlete.LatestActivityId = latestActivity.Id;
-
-                _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
-                
-                _logger.LogInformation($"Posting message for {athlete.Name} now.");
+                _logger.LogInformation($"Building message for {athlete.Name} now.");
 
                 var message = _messageFactory.NewActivityMessage(athlete, latestActivity).Result;
 
                 _logger.LogInformation("12");
                 _logger.LogInformation(JsonConvert.SerializeObject(message));
+                _logger.LogInformation($"Updating {athlete.Name} now.");
+                
+                athlete.LatestActivityId = latestActivity.Id;
+
+                _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
+
+                _logger.LogInformation($"Posting message for {athlete.Name} now.");
 
                 //_slackService.PostSlackMessage(message).Wait();
 
