@@ -44,7 +44,7 @@ namespace ExerciseDaemon.BackgroundWorker
         {
             _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(FrequencySeconds));
 
-            _otherTimer = new Timer(DoOtherWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+           // _otherTimer = new Timer(DoOtherWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
             return Task.CompletedTask;
         }
