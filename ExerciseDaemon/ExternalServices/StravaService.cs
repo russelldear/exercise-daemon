@@ -8,6 +8,7 @@ using ExerciseDaemon.Helpers;
 using ExerciseDaemon.Models;
 using ExerciseDaemon.Models.Strava;
 using ExerciseDaemon.Repositories;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace ExerciseDaemon.ExternalServices
@@ -21,16 +22,17 @@ namespace ExerciseDaemon.ExternalServices
         private readonly SlackService _slackService;
         private readonly StatementRandomiser _sr;
         private readonly MessageFactory _messageFactory;
+        private readonly ILogger<StravaService> _logger;
         private readonly HttpClient _client;
 
-        public StravaService(StravaSettings stravaSettings, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr, MessageFactory messageFactory)
+        public StravaService(StravaSettings stravaSettings, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr, MessageFactory messageFactory, ILogger<StravaService> logger)
         {
             _stravaSettings = stravaSettings;
             _athleteRepository = athleteRepository;
             _slackService = slackService;
             _sr = sr;
             _messageFactory = messageFactory;
-
+            _logger = logger;
             _client = new HttpClient();
         }
 
@@ -54,8 +56,12 @@ namespace ExerciseDaemon.ExternalServices
 
         private async Task<StravaTokenSet> EnsureValidTokens(StravaTokenSet tokenSet, int athleteIdentifier)
         {
+            _logger.LogInformation("Ensuring tokens.");
+
             if (tokenSet.ExpiresAt.ToUniversalTime() < DateTimeOffset.UtcNow.AddMinutes(5))
             {
+                _logger.LogInformation("Token expiring; refreshing.");
+
                 var athlete = await _athleteRepository.GetAthlete(athleteIdentifier) ?? new Athlete();
 
                 var url = $"https://www.strava.com/api/v3/oauth/token?client_id={_stravaSettings.ClientId}&client_secret={_stravaSettings.ClientSecret}&grant_type=refresh_token&refresh_token={tokenSet.RefreshToken}";
@@ -73,6 +79,8 @@ namespace ExerciseDaemon.ExternalServices
                     athlete.AccessToken = tokenSet.AccessToken;
                     athlete.RefreshToken = tokenSet.RefreshToken;
                     athlete.ExpiresAt = tokenSet.ExpiresAt;
+
+                    _logger.LogInformation("Token refresh successful; updating saved athlete.");
 
                     await _athleteRepository.CreateOrUpdateAthlete(athlete);
                 }
@@ -147,13 +155,19 @@ namespace ExerciseDaemon.ExternalServices
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenSet.AccessToken);
 
+            _logger.LogInformation($"Sending Strava request: {request.RequestUri}");
+
             var response = await _client.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
+                _logger.LogInformation($"Strava request successful.");
+
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 result = JsonConvert.DeserializeObject<T>(responseString);
+
+                _logger.LogInformation($"Strava request deserialised.");
             }
 
             return result;

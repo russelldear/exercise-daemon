@@ -4,6 +4,7 @@ using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using ExerciseDaemon.Models.Strava;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static ExerciseDaemon.Constants.DocumentProperties;
 
@@ -14,8 +15,9 @@ namespace ExerciseDaemon.Repositories
         private const string AthletesTableName = "ExerciseDaemon-Athletes";
 
         private readonly Table _athletesTable;
+        private readonly ILogger<AthleteRepository> _logger;
 
-        public AthleteRepository(DynamoDbSettings dynamoDbSettings)
+        public AthleteRepository(DynamoDbSettings dynamoDbSettings, ILogger<AthleteRepository> logger)
         {
             AmazonDynamoDBConfig clientConfig;
 
@@ -31,6 +33,8 @@ namespace ExerciseDaemon.Repositories
             var dynamoDbClient = new AmazonDynamoDBClient(clientConfig);
 
             _athletesTable = Table.LoadTable(dynamoDbClient, AthletesTableName);
+
+            _logger = logger;
         }
 
         public async Task CreateOrUpdateAthlete(Athlete athlete)
@@ -40,6 +44,8 @@ namespace ExerciseDaemon.Repositories
             var item = Document.FromJson(asJson);
 
             await _athletesTable.PutItemAsync(item);
+
+            _logger.LogInformation("Athlete created/updated.");
         }
 
         public async Task<Athlete> GetAthlete(int id)
