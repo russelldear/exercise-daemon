@@ -9,6 +9,7 @@ using ExerciseDaemon.Models.Strava;
 using ExerciseDaemon.Repositories;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static ExerciseDaemon.Constants.StatementSetKeys;
 
 namespace ExerciseDaemon.BackgroundWorker
@@ -55,10 +56,13 @@ namespace ExerciseDaemon.BackgroundWorker
                 foreach (var athlete in athletes)
                 {
                     _logger.LogInformation($"Checking {athlete.Name} now.");
-                
+
                     var tokenSet = new StravaTokenSet(athlete.AccessToken, athlete.RefreshToken, athlete.ExpiresAt);
 
                     var activities = _stravaService.GetRecentActivities(tokenSet, athlete.Id).Result;
+
+                    _logger.LogInformation($"Athlete: {JsonConvert.SerializeObject(athlete)}");
+                    _logger.LogInformation($"Activities: {JsonConvert.SerializeObject(activities)}");
 
                     if (activities.Any())
                     {

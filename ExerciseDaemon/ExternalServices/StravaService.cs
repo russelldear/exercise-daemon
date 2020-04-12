@@ -166,8 +166,6 @@ namespace ExerciseDaemon.ExternalServices
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 result = JsonConvert.DeserializeObject<T>(responseString);
-
-                _logger.LogInformation($"Strava request deserialised: {responseString}");
             }
 
             return result;
