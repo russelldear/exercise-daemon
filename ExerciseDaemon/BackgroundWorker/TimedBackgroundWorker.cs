@@ -54,6 +54,8 @@ namespace ExerciseDaemon.BackgroundWorker
 
                 foreach (var athlete in athletes)
                 {
+                    _logger.LogInformation($"Checking {athlete.Name} now.");
+                
                     var tokenSet = new StravaTokenSet(athlete.AccessToken, athlete.RefreshToken, athlete.ExpiresAt);
 
                     var activities = _stravaService.GetRecentActivities(tokenSet, athlete.Id).Result;
@@ -61,6 +63,10 @@ namespace ExerciseDaemon.BackgroundWorker
                     if (activities.Any())
                     {
                         CheckForNewActivity(athlete, activities);
+                    }
+                    else 
+                    {
+                        _logger.LogInformation($"No activities for {athlete.Name}.");
                     }
 
                     if (athlete.ReminderCount == 0)
@@ -93,15 +99,21 @@ namespace ExerciseDaemon.BackgroundWorker
 
             if (hasNoRecordedActivities || hasUnrecordedActivity)
             {
+                _logger.LogInformation($"Updating {athlete.Name} now.");
+                
                 var latestActivity = activities.First();
 
                 athlete.LatestActivityId = latestActivity.Id;
 
                 _athleteRepository.CreateOrUpdateAthlete(athlete).Wait();
+                
+                _logger.LogInformation($"Posting message for {athlete.Name} now.");
 
                 var message = _messageFactory.NewActivityMessage(athlete, latestActivity);
 
                 _slackService.PostSlackMessage(message).Wait();
+                
+                _logger.LogInformation($"Posted for {athlete.Name}.");
             }
         }
 
