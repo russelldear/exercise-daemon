@@ -104,7 +104,7 @@ namespace ExerciseDaemon.ExternalServices
 
             await _athleteRepository.CreateOrUpdateAthlete(athlete);
 
-            await PostWelcomeMessage(slackUserId, latestActivity);
+            //await PostWelcomeMessage(slackUserId, latestActivity);
 
             return athlete;
         }
