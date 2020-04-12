@@ -115,6 +115,10 @@ namespace ExerciseDaemon.BackgroundWorker
                 
                 _logger.LogInformation($"Posted for {athlete.Name}.");
             }
+            else
+            {
+                _logger.LogInformation($"No new activity for {athlete.Name}.");
+            }
         }
 
         private void CheckForWeeklyReminder(List<Activity> activities, Athlete athlete)
