@@ -27,7 +27,7 @@ namespace ExerciseDaemon.Helpers
 
             if (latestActivity.Map != null && !string.IsNullOrWhiteSpace(latestActivity.Map.SummaryPolyline))
             {
-                imageUrl = _googleMaps.BuildMap(latestActivity.Id, latestActivity.Map.SummaryPolyline).Result;
+                //imageUrl = _googleMaps.BuildMap(latestActivity.Id, latestActivity.Map.SummaryPolyline).Result;
             }
 
             var attachment = new Attachment{ ImageUrl = imageUrl };

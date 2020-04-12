@@ -44,16 +44,7 @@ namespace ExerciseDaemon.BackgroundWorker
         {
             _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(FrequencySeconds));
 
-           // _otherTimer = new Timer(DoOtherWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
-
             return Task.CompletedTask;
-        }
-
-        private void DoOtherWork(object state)
-        {
-            var athletes = _athleteRepository.GetAthletes().Result;
-
-            _logger.LogInformation($"Athletes: {JsonConvert.SerializeObject(athletes)}");
         }
 
         private void DoWork(object state)
@@ -126,9 +117,9 @@ namespace ExerciseDaemon.BackgroundWorker
                 
                 _logger.LogInformation($"Posting message for {athlete.Name} now.");
 
-                //var message = _messageFactory.NewActivityMessage(athlete, latestActivity);
+                var message = _messageFactory.NewActivityMessage(athlete, latestActivity);
 
-                //_slackService.PostSlackMessage(message).Wait();
+                _slackService.PostSlackMessage(message).Wait();
                 
                 _logger.LogInformation($"Posted for {athlete.Name}.");
             }
