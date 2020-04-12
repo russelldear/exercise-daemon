@@ -15,7 +15,7 @@ namespace ExerciseDaemon.BackgroundWorker
 {
     public class TimedBackgroundWorker : IHostedService, IDisposable
     {
-        private const int FrequencySeconds = 30;
+        private const int FrequencySeconds = 300;
 
         private readonly StravaService _stravaService;
         private readonly AthleteRepository _athleteRepository;
@@ -46,6 +46,8 @@ namespace ExerciseDaemon.BackgroundWorker
 
         private void DoWork(object state)
         {
+            _logger.LogInformation("Timed background worker starting.");
+        
             try
             {
                 var athletes = _athleteRepository.GetAthletes().Result;
@@ -79,6 +81,8 @@ namespace ExerciseDaemon.BackgroundWorker
             {
                 _logger.LogError(e, $"Timed background worker failed: '{e.Message}'");
             }
+            
+            _logger.LogInformation("Timed background worker ending.");
         }
 
         private void CheckForNewActivity(Athlete athlete, List<Activity> activities)
