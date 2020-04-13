@@ -16,7 +16,7 @@ namespace ExerciseDaemon
                 return $"{Math.Round(source.Value / 1000, 1, MidpointRounding.AwayFromZero)}km";
             }
 
-            return $"{Math.Round(source.Value / 1000, 0, MidpointRounding.AwayFromZero)}m";
+            return $"{Math.Round(source.Value, 0, MidpointRounding.AwayFromZero)}m";
         }
 
         public static string ToFormattedElevation(this float? source)
@@ -26,7 +26,7 @@ namespace ExerciseDaemon
                 return null;
             }
 
-            return $"{Math.Round(source.Value / 1000, 0, MidpointRounding.AwayFromZero)}m";
+            return $"{Math.Round(source.Value, 0, MidpointRounding.AwayFromZero)}m";
         }
     }
 }
