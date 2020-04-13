@@ -121,7 +121,7 @@ namespace ExerciseDaemon.BackgroundWorker
 
                 _logger.LogInformation($"Posting message for {athlete.Name} now.");
 
-                //_slackService.PostSlackMessage(message).Wait();
+                _slackService.PostSlackMessage(message).Wait();
 
                 _logger.LogInformation($"Posted for {athlete.Name}.");
             }

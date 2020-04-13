@@ -89,18 +89,20 @@ namespace ExerciseDaemon.ExternalServices
             }
             else
             {
-                using (var client = new AmazonS3Client("", "", RegionEndpoint.USEast1))
+                using (var client = new AmazonS3Client(RegionEndpoint.USEast1))
                 {
                     await Upload(s3Filename, client);
                 }
             }
         }
 
-        private static async Task Upload(string s3Filename, IAmazonS3 client)
+        private async Task Upload(string s3Filename, IAmazonS3 client)
         {
             using (var ms = new MemoryStream())
             using (var file = new FileStream(s3Filename, FileMode.Open, FileAccess.Read))
             {
+                _logger.LogInformation($"File length: {file.Length}");
+
                 var bytes = new byte[file.Length];
 
                 file.Read(bytes, 0, (int) file.Length);
