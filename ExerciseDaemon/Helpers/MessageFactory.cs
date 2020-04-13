@@ -34,8 +34,8 @@ namespace ExerciseDaemon.Helpers
                 imageUrl = await _googleMaps.BuildMap(latestActivity.Id, latestActivity.Map.SummaryPolyline);
             }
 
-            var attachment = new Attachment {ImageUrl = imageUrl};
-
+            var attachment = new Attachment {Title = latestActivity.Name, ImageUrl = imageUrl};
+            
             var fields = new List<Field>();
 
             var distance = latestActivity.Distance.ToFormattedDistance();
