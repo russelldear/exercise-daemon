@@ -20,17 +20,15 @@ namespace ExerciseDaemon.ExternalServices
         private readonly StravaSettings _stravaSettings;
         private readonly AthleteRepository _athleteRepository;
         private readonly SlackService _slackService;
-        private readonly StatementRandomiser _sr;
         private readonly MessageFactory _messageFactory;
         private readonly ILogger<StravaService> _logger;
         private readonly HttpClient _client;
 
-        public StravaService(StravaSettings stravaSettings, AthleteRepository athleteRepository, SlackService slackService, StatementRandomiser sr, MessageFactory messageFactory, ILogger<StravaService> logger)
+        public StravaService(StravaSettings stravaSettings, AthleteRepository athleteRepository, SlackService slackService, MessageFactory messageFactory, ILogger<StravaService> logger)
         {
             _stravaSettings = stravaSettings;
             _athleteRepository = athleteRepository;
             _slackService = slackService;
-            _sr = sr;
             _messageFactory = messageFactory;
             _logger = logger;
             _client = new HttpClient();
@@ -56,8 +54,6 @@ namespace ExerciseDaemon.ExternalServices
 
         private async Task<StravaTokenSet> EnsureValidTokens(StravaTokenSet tokenSet, int athleteIdentifier)
         {
-            _logger.LogInformation("Ensuring tokens.");
-
             if (tokenSet.ExpiresAt.ToUniversalTime() < DateTimeOffset.UtcNow.AddMinutes(5))
             {
                 _logger.LogInformation("Token expiring; refreshing.");
@@ -151,7 +147,7 @@ namespace ExerciseDaemon.ExternalServices
         {
             tokenSet = await EnsureValidTokens(tokenSet, athleteIdentifier);
 
-            T result = default(T);
+            var result = default(T);
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenSet.AccessToken);
 
@@ -161,7 +157,7 @@ namespace ExerciseDaemon.ExternalServices
 
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation($"Strava request successful.");
+                _logger.LogInformation("Strava request successful.");
 
                 var responseString = await response.Content.ReadAsStringAsync();
 

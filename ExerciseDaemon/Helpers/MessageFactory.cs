@@ -6,7 +6,6 @@ using ExerciseDaemon.ExternalServices;
 using ExerciseDaemon.Models.Slack;
 using ExerciseDaemon.Models.Strava;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using static ExerciseDaemon.Constants.StatementSetKeys;
 
 namespace ExerciseDaemon.Helpers
@@ -33,12 +32,9 @@ namespace ExerciseDaemon.Helpers
             if (latestActivity.Map != null && !string.IsNullOrWhiteSpace(latestActivity.Map.SummaryPolyline))
             {
                 imageUrl = await _googleMaps.BuildMap(latestActivity.Id, latestActivity.Map.SummaryPolyline);
-                _logger.LogInformation("9");
-                _logger.LogInformation(imageUrl);
-                await Task.Delay(5000);
             }
 
-            var attachment = new Attachment{ ImageUrl = imageUrl };
+            var attachment = new Attachment {ImageUrl = imageUrl};
 
             var fields = new List<Field>();
 
@@ -46,14 +42,14 @@ namespace ExerciseDaemon.Helpers
 
             if (!string.IsNullOrWhiteSpace(distance))
             {
-                fields.Add(new Field { Title = "Distance", Value = distance, IsShort = true });
+                fields.Add(new Field {Title = "Distance", Value = distance, IsShort = true});
             }
 
             var elevation = latestActivity.Elevation.ToFormattedElevation();
 
             if (!string.IsNullOrWhiteSpace(elevation))
             {
-                fields.Add(new Field { Title = "Elevation", Value = elevation, IsShort = true });
+                fields.Add(new Field {Title = "Elevation", Value = elevation, IsShort = true});
             }
 
             if (fields.Any())
@@ -61,13 +57,9 @@ namespace ExerciseDaemon.Helpers
                 attachment.Fields = fields.ToArray();
             }
 
-            _logger.LogInformation("10");
+            var slackMessage = new SlackMessage {Text = message, Attachments = new[] {attachment}};
 
-            var slackMessage = new SlackMessage { Text = message, Attachments = new[] { attachment } };
-
-            _logger.LogInformation("11");
-            _logger.LogInformation(JsonConvert.SerializeObject(slackMessage));
-            await Task.Delay(5000);
+            _logger.LogInformation("Slack message created.");
 
             return slackMessage;
         }

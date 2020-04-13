@@ -1,4 +1,5 @@
 ﻿using AspNetCore.OAuth.Provider.Strava;
+using ExerciseDaemon.BackgroundWorker;
 using ExerciseDaemon.ExternalServices;
 using ExerciseDaemon.Helpers;
 using ExerciseDaemon.Repositories;
@@ -40,6 +41,7 @@ namespace ExerciseDaemon
             var s3Settings = _substitutionBinder.BuildS3Settings();
             services.TryAddSingleton(s3Settings);
 
+            services.TryAddSingleton<DaemonTask>();
             services.TryAddSingleton<AthleteRepository>();
             services.TryAddSingleton<StravaService>();
             services.TryAddSingleton<SlackService>();
