@@ -43,38 +43,54 @@ namespace ExerciseDaemon.BackgroundWorker
 
                 _logger.LogInformation($"Athletes: {JsonConvert.SerializeObject(athletes)}");
 
+                Exception exception = null;
+
                 foreach (var athlete in athletes)
                 {
-                    _logger.LogInformation($"Checking {athlete.Name} now.");
-
-                    var tokenSet = new StravaTokenSet(athlete.AccessToken, athlete.RefreshToken, athlete.ExpiresAt);
-
-                    var activities = await _stravaService.GetRecentActivities(tokenSet, athlete.Id);
-
-                    _logger.LogInformation($"Athlete: {JsonConvert.SerializeObject(athlete)}");
-                    _logger.LogInformation($"Activities: {JsonConvert.SerializeObject(activities)}");
-
-                    if (activities.Any())
+                    try
                     {
-                        await CheckForNewActivity(athlete, activities);
-                    }
-                    else
-                    {
-                        _logger.LogInformation($"No activities for {athlete.Name}.");
-                    }
+                        _logger.LogInformation($"Checking {athlete.Name} now.");
 
-                    if (athlete.ReminderCount == 0)
-                    {
-                        await CheckForWeeklyReminder(activities, athlete);
+                        var tokenSet = new StravaTokenSet(athlete.AccessToken, athlete.RefreshToken, athlete.ExpiresAt);
+
+                        var activities = await _stravaService.GetRecentActivities(tokenSet, athlete.Id);
+
+                        _logger.LogInformation($"Athlete: {JsonConvert.SerializeObject(athlete)}");
+                        _logger.LogInformation($"Activities: {JsonConvert.SerializeObject(activities)}");
+
+                        if (activities.Any())
+                        {
+                            await CheckForNewActivity(athlete, activities);
+                        }
+                        else
+                        {
+                            _logger.LogInformation($"No activities for {athlete.Name}.");
+                        }
+
+                        if (athlete.ReminderCount == 0)
+                        {
+                            await CheckForWeeklyReminder(activities, athlete);
+                        }
+                        else if (athlete.ReminderCount == 1)
+                        {
+                            await CheckForFortnightReminder(athlete);
+                        }
+                        else if (athlete.ReminderCount == 2)
+                        {
+                            await CheckForMonthReminder(athlete);
+                        }
                     }
-                    else if (athlete.ReminderCount == 1)
+                    catch (Exception e)
                     {
-                        await CheckForFortnightReminder(athlete);
+                        _logger.LogError(e, $"Exception thrown for {athlete.Name}.");
+
+                        exception = e;
                     }
-                    else if (athlete.ReminderCount == 2)
-                    {
-                        await CheckForMonthReminder(athlete);
-                    }
+                }
+
+                if (exception != null)
+                {
+                    throw exception;
                 }
             }
             catch (Exception e)
