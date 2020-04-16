@@ -6,7 +6,7 @@ namespace ExerciseDaemon
     {
         public static string ToFormattedDistance(this float? source)
         {
-            if (!source.HasValue)
+            if (!source.HasValue || source.Value == 0)
             {
                 return null;
             }
@@ -21,7 +21,7 @@ namespace ExerciseDaemon
 
         public static string ToFormattedElevation(this float? source)
         {
-            if (!source.HasValue)
+            if (!source.HasValue || source.Value == 0)
             {
                 return null;
             }
