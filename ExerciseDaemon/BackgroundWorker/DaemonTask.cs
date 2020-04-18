@@ -120,6 +120,8 @@ namespace ExerciseDaemon.BackgroundWorker
                 _logger.LogInformation($"Updating {athlete.Name} now.");
 
                 athlete.LatestActivityId = latestActivity.Id;
+                athlete.ReminderCount = 0;
+                athlete.LastReminderDateTimeUtc = DateTime.UtcNow;
 
                 await _athleteRepository.CreateOrUpdateAthlete(athlete);
 
