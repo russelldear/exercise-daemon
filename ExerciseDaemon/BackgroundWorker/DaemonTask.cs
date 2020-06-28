@@ -69,15 +69,15 @@ namespace ExerciseDaemon.BackgroundWorker
 
                         if (athlete.ReminderCount == 0)
                         {
-                            await CheckForWeeklyReminder(activities, athlete);
+                            //await CheckForWeeklyReminder(activities, athlete);
                         }
                         else if (athlete.ReminderCount == 1)
                         {
-                            await CheckForFortnightReminder(athlete);
+                            //await CheckForFortnightReminder(athlete);
                         }
                         else if (athlete.ReminderCount == 2)
                         {
-                            await CheckForMonthReminder(athlete);
+                            //await CheckForMonthReminder(athlete);
                         }
                     }
                     catch (Exception e)
