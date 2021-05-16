@@ -58,12 +58,12 @@ namespace ExerciseDaemon.Helpers
             "I'm not saying that was a _perfect_ {1}, {0}, but I haven't seen a better one - and I've been doing this a looong time, know what I mean?",
             "Damn, {0}, back at it again with those slammin' {1}s.",
             "I liked you before, {0}, but after that {1} just now - well, let's just say you're #1 in my book.",
-            "You're making this lockdown bizzo a lot easier with those {1}s, {0}. Bring 'em on.",
             "{1} long and prosper, Captain {0} :spock-hand:",
             "{0}. {1}. Winning.",
             "Another {1}? The (free non-alcoholic) drinks are on me, {0}.",
             "{0}'s {1} : legen.......wait for it...........dary.",
-            "Are you icecream, {0}? 'Cause that {1} was tip-top."
+            "Are you icecream, {0}? 'Cause that {1} was tip-top.",
+            "Ka rawe to mahi, e hoa!"
         };
 
         private readonly List<string> _weekReminder = new List<string>
